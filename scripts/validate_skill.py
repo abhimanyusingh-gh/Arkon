@@ -10,6 +10,19 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "skills/craft"
+REFERENCES = SKILL / "references"
+LINE_CAPS = {"verification.md": 110, "review.md": 70, "security.md": 75, "testing.md": 200}
+RULE_ID_SOURCES = ("verification.md", "review.md")
+
+
+def referenced_rule_ids(path):
+    return set(re.findall(r"`([A-Z][A-Z-]*)`", path.read_text()))
+
+
+def rule_is_defined(rule_id, references=REFERENCES):
+    escaped = re.escape(rule_id)
+    definition = re.compile(rf"\*\*{escaped}\s+[—-]|^## {escaped}\s+[—-]|^# {escaped}\s", re.M)
+    return any(definition.search(path.read_text()) for path in references.glob("*.md"))
 
 
 def validate():
@@ -36,6 +49,14 @@ def validate():
         errors.append(f"SKILL.md: reference has no trigger: {orphan}")
     if len(entry.splitlines()) > 110:
         errors.append("SKILL.md: exceeds the repository's 110-line entrypoint budget")
+    for name, cap in LINE_CAPS.items():
+        lines = len((REFERENCES / name).read_text().splitlines())
+        if lines > cap:
+            errors.append(f"references/{name}: {lines} lines exceeds the {cap}-line cap")
+    for name in RULE_ID_SOURCES:
+        for rule_id in sorted(referenced_rule_ids(REFERENCES / name)):
+            if not rule_is_defined(rule_id):
+                errors.append(f"references/{name}: undefined rule ID {rule_id}")
 
     documents = [ROOT / "README.md", ROOT / "EVIDENCE.md", *SKILL.rglob("*.md"),
                  *ROOT.glob("docs/*.md"), *ROOT.glob("evals/**/*.md")]
