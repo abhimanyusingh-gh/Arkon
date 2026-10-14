@@ -176,54 +176,54 @@ State these alongside any number from this file, or the numbers mislead.
 
 ## Twenty rule families from a reported 9-week audit
 
-Commit `fb5b867` reported evidence from `document-criteria-matcher` (ME-97 prefill scheduler and prior work), `clinic-gateway` (dependency management), and `software-craftsmanship` (skill updates): 122 commit lines (105 unique subjects), 4 PRs with teammate raises (DCM #22: 6 raises; #43: 9; CG #413: 4; #414: 1), and 37 rework commits. Those aggregate classifications were not independently reproduced in the later local-history review; they remain reported evidence, rather than verified incident totals.
+The commit that added these rule families reported evidence from two further private codebases, referred to here as Repo D (an asynchronous document-matching service) and Repo E (an API gateway, dependency management), and from this skill repository: 122 commit lines (105 unique subjects), 4 PRs with teammate raises (Repo D: 6 and 9 raises; Repo E: 4 and 1), and 37 rework commits. Those aggregate classifications were not independently reproduced in the later local-history review; they remain reported evidence, rather than verified incident totals.
 
 **Scope and counting:** Aug 12–Oct 14 is 9 weeks, not the author's entire history. Commit counts measure slicing; subjects are not reliable deduplication keys. A claim/fence implementation, a test class, a review raise, and a corrective commit are different units. Same-branch rework is self-detected, not a review finding. Several commits can belong to one failure sequence. The ranks below are the original priorities, not a comparable frequency ranking.
 
 | Priority | Rule ID | Rule | Reported signal | Repos | Severity | Reference |
 |---|---|---|---|---|---|---|
-| 1 | LOG-FAILURE / LOG-LENGTH | Keep sensitive content out of telemetry and error responses | 7 | DCM + CG | blocker on data-bearing paths | `observability.md` |
-| 2 | COMMIT-TRUTH | Commit subject describes diff; no same subject over different diffs | 6 | CG + DCM | should-fix | `workflow.md` |
-| 3 | JOB-LEASE | Exclusive job execution via database lease | 5 | DCM | blocker | `async-jobs.md` |
-| 4 | MIGRATE-ROLLING / MIGRATE-IMMUTABLE | Safe schema migrations for rolling deploys | 5 | DCM | blocker | `workflow.md` |
-| 5 | REPRO-FIRST | Establish the failing path and state reproduction limits before changing error behavior | 4 | DCM + CG | should-fix | `review.md` |
-| 6 | LOG-SENTINEL | Content-bearing failure sinks get meaningful leak-sentinel coverage | 11 test classes | DCM | should-fix | `observability.md` |
-| 7 | DEP-PIN-SUPPRESS | Overrides/suppressions carry rationale, applicable advisory, and removal condition | 4 | CG | should-fix | `dependencies.md` |
-| 8 | DEP-BOOT | Real app boots after upgrade; diff transitive tree | 3 | CG | blocker | `dependencies.md` |
-| 9 | LOCK-MINIMAL | Choose the smallest correct serialization mechanism for the actual datastore/isolation level | 3 | DCM | should-fix | `authoring.md` Database |
-| 10 | CONFIG-FAIL-CLOSED | Secrets get no production default; invalid config fails at startup | 4 | DCM | should-fix | `authoring.md` |
-| 11 | TEST-PIN | Characterization tests must fail when behaviour changes | 3 | DCM | should-fix | `testing.md` |
-| 12 | TEST-CONCURRENCY | Every exclusivity claim tested against real database | 5 test classes | DCM | should-fix | `testing.md` + `async-jobs.md` |
-| 13 | JOB-FENCE | Claim with token; finalize filters on scope + id + token | 4 mechanisms | DCM | blocker | `async-jobs.md` |
-| 14 | JOB-RETIRE | Mark obsolete, not deleted; retire after complete crawl only | 3 | DCM | should-fix | `async-jobs.md` |
-| 15 | JOB-GATE-ORDER / TEST-GATE | Gates checked cheapest first; one test per gate | 7 tests | DCM | should-fix | `async-jobs.md` |
-| 16 | NAME-FULL | Clear names in the repository's vocabulary; avoid ambiguous abbreviations | 3 | DCM | nit / should-fix | `authoring.md` NAME-* |
-| 17 | LLM-FAILSAFE | Model output checked against request and authorized domain constraints | 3 | DCM | impact-dependent | `llm-calls.md` |
-| 18 | LLM-CORRELATE / LOG-FIELDS | Privacy-reviewed correlation propagated through stage and attempt | 3 | DCM | should-fix | `llm-calls.md` + `observability.md` |
-| 19 | LOG-LENGTH / LLM-PROMPT | Minimize model inputs and log untrusted content safely | 2 | DCM | should-fix | `observability.md` / `llm-calls.md` |
-| 20 | BRAND-SCOPE | Brand only where mix-up is possible; avoid ceremony | 2 | DCM | nit | `authoring.md` Type safety |
+| 1 | LOG-FAILURE / LOG-LENGTH | Keep sensitive content out of telemetry and error responses | 7 | D + E | blocker on data-bearing paths | `observability.md` |
+| 2 | COMMIT-TRUTH | Commit subject describes diff; no same subject over different diffs | 6 | D + E | should-fix | `workflow.md` |
+| 3 | JOB-LEASE | Exclusive job execution via database lease | 5 | D | blocker | `async-jobs.md` |
+| 4 | MIGRATE-ROLLING / MIGRATE-IMMUTABLE | Safe schema migrations for rolling deploys | 5 | D | blocker | `workflow.md` |
+| 5 | REPRO-FIRST | Establish the failing path and state reproduction limits before changing error behavior | 4 | D + E | should-fix | `review.md` |
+| 6 | LOG-SENTINEL | Content-bearing failure sinks get meaningful leak-sentinel coverage | 11 test classes | D | should-fix | `observability.md` |
+| 7 | DEP-PIN-SUPPRESS | Overrides/suppressions carry rationale, applicable advisory, and removal condition | 4 | E | should-fix | `dependencies.md` |
+| 8 | DEP-BOOT | Real app boots after upgrade; diff transitive tree | 3 | E | blocker | `dependencies.md` |
+| 9 | LOCK-MINIMAL | Choose the smallest correct serialization mechanism for the actual datastore/isolation level | 3 | D | should-fix | `authoring.md` Database |
+| 10 | CONFIG-FAIL-CLOSED | Secrets get no production default; invalid config fails at startup | 4 | D | should-fix | `authoring.md` |
+| 11 | TEST-PIN | Characterization tests must fail when behaviour changes | 3 | D | should-fix | `testing.md` |
+| 12 | TEST-CONCURRENCY | Every exclusivity claim tested against real database | 5 test classes | D | should-fix | `testing.md` + `async-jobs.md` |
+| 13 | JOB-FENCE | Claim with token; finalize filters on scope + id + token | 4 mechanisms | D | blocker | `async-jobs.md` |
+| 14 | JOB-RETIRE | Mark obsolete, not deleted; retire after complete crawl only | 3 | D | should-fix | `async-jobs.md` |
+| 15 | JOB-GATE-ORDER / TEST-GATE | Gates checked cheapest first; one test per gate | 7 tests | D | should-fix | `async-jobs.md` |
+| 16 | NAME-FULL | Clear names in the repository's vocabulary; avoid ambiguous abbreviations | 3 | D | nit / should-fix | `authoring.md` NAME-* |
+| 17 | LLM-FAILSAFE | Model output checked against request and authorized domain constraints | 3 | D | impact-dependent | `llm-calls.md` |
+| 18 | LLM-CORRELATE / LOG-FIELDS | Privacy-reviewed correlation propagated through stage and attempt | 3 | D | should-fix | `llm-calls.md` + `observability.md` |
+| 19 | LOG-LENGTH / LLM-PROMPT | Minimize model inputs and log untrusted content safely | 2 | D | should-fix | `observability.md` / `llm-calls.md` |
+| 20 | BRAND-SCOPE | Brand only where mix-up is possible; avoid ceremony | 2 | D | nit | `authoring.md` Type safety |
 
 **Data that disproved existing rules:**
 
 | Earlier claim | What the data shows | Action |
 |---|---|---|
-| CONFIG-DAY-ONE: "every config service carries a hardcoded default" | Reported DCM commit `79e5a62` removes production defaults; missing values fail startup | `CONFIG-FAIL-CLOSED` separates optional tuning defaults from secrets and required production configuration |
-| Branded types mandatory | Reported DCM review reversal `b85d2fd` after over-application through CLAUDE.md | `BRAND-SCOPE` requires a concrete mix-up risk; use the language's native domain types where appropriate |
+| CONFIG-DAY-ONE: "every config service carries a hardcoded default" | A reported Repo D commit removes production defaults; missing values fail startup | `CONFIG-FAIL-CLOSED` separates optional tuning defaults from secrets and required production configuration |
+| Branded types mandatory | A reported Repo D review reversal after over-application through CLAUDE.md | `BRAND-SCOPE` requires a concrete mix-up risk; use the language's native domain types where appropriate |
 | TOUCH-BLAST | The audit reported violations by its own author | A written rule is not enforcement; check behavior against the base and distinguish cleanup from unrelated changes |
 
 **Issues reported at that audit's snapshot, not reverified as current defects:**
-- `ReferralController.java:45/:83/:85` return raw exception messages in HTTP error bodies
-- `CoachTaskManagerClientImpl.java:79` puts message into wrapping exception
-- `StructuredLogger` still has `warn`/`error(…, Throwable)` overloads
+- Three REST controller error paths in Repo D return raw exception messages in HTTP error bodies
+- One outbound client in Repo D puts the upstream message into a wrapping exception
+- Repo D's structured logger still has `warn`/`error(…, Throwable)` overloads
 
 ## Local authored-history review, October 14, 2026
 
-The enhancement after `fb5b867` inspected the available authored history across local checkouts, rather than treating the 9-week subset as the entire history. This is a reachability inventory and a set of inspected examples, not a new defect-frequency study.
+The enhancement after the four-guide commit inspected the available authored history across local checkouts, rather than treating the 9-week subset as the entire history. This is a reachability inventory and a set of inspected examples, not a new defect-frequency study.
 
 | Source | Verified scope | Limits |
 |---|---|---|
-| This skill repository | Non-shallow; 7 commits reachable from the reviewed HEAD `fb5b867`, 13 unique objects across local branches, tags, and remote-tracking refs | Pre-squash branch commits and the resulting squash commits describe overlapping work; 13 objects are not 13 independent changes |
-| Other local checkouts under `/Users/abhimanyu/workspaces` | 41 repository/worktree directories, 40 common Git directories, 31 repository basenames; 18 basenames had commits matching the author's known identities | Repeated checkouts and worktrees are present; these are discovery counts, not counts of independent applications |
+| This skill repository | Non-shallow; 7 commits reachable from the reviewed HEAD (the commit that added the four guides), 13 unique objects across local branches, tags, and remote-tracking refs | Pre-squash branch commits and the resulting squash commits describe overlapping work; 13 objects are not 13 independent changes |
+| Other local checkouts in the author's workspace | 41 repository/worktree directories, 40 common Git directories, 31 repository basenames; 18 basenames had commits matching the author's known identities | Repeated checkouts and worktrees are present; these are discovery counts, not counts of independent applications |
 | Authored commits in those other checkouts | 953 globally distinct hashes, July 9–October 14; 913 non-merge; 907 after excluding 6 non-merge stash-like snapshots; 539 nonempty stable patch IDs; 486 distinct exact subjects | Excludes this skill repository. Hashes, patch IDs, and subjects count different things; none counts defects or independent incidents |
 
 The inventory used locally reachable `--all` refs, recorded commit identities and parent hashes, and deduplicated hashes across checkouts. It did not fetch remotes or inspect deleted branches, reflogs, or unavailable repositories. An empty patch ID is excluded from the patch count; matching patch IDs help identify repeated patches, not semantic equivalence. Attribution depends on recorded author identities. This is the available local history, not a claim to have inspected the author's entire remote history.
@@ -232,17 +232,17 @@ Selected verified examples:
 
 | Repository and commits | What the inspected diff establishes | Guidance it informs |
 |---|---|---|
-| `clinical-case-report`: `8b5c8771b112`, `6057dac69bfa` | A CCR-609 sequence adds report-start filtering and deterministic measurement selection, then aligns calculated BMI with the height printed in the report | `APP-DATA`: define temporal selection and cross-field consistency; this pair is one sequence, not two independent incidents |
-| `message-triaging`: `570c5a68b337` | Processing follows the event's message ID instead of asking for the latest message, which can refer to a newer event | `IO-IDEMPOTENT`: preserve event identity through asynchronous processing |
-| `message-triaging`: `4912d71ead2d` | A frontend feature gate protects use of a new backend endpoint that was merged but not yet deployed | `DELIVERY-READY`: verify deployed compatibility and release order, separately from merge order |
-| `medication-eligibility`: `3b3e7ed63a01` | Cypress expectations change after an intentional initial-selection change from Wegovy to Tirzepatide | Counterexample to immutable assertions: preserve coverage while updating tests to an explicitly changed acceptance contract |
-| `medication-eligibility`: `79ba9ac15b25` | Draft branch state is retained separately from saved active-branch values, with tests for excluding hidden notes from save | `STATE-DRAFT` and `INPUT-BOUNDARY`: check the persisted result, including omitted and inactive fields |
-| `medication-eligibility`: `62435aab6d4a`, `a0cd79ff44ab` | Medication rendering gains an explicit flag guard; a later AI-preview change prevents save until the preview is resolved | `AUTH-BOUNDARY` distinguishes flags from permission; `STATE-ASYNC` separates suggested values from committed user intent |
-| `document-criteria-matcher`: `b85d2fd01323` | Semantic wrappers are removed from pass-through call chains while retained at a boundary with meaningful validation | `BRAND-SCOPE`: use domain types where they prevent a concrete error, without mandatory wrapper propagation |
+| Repo F (clinical reporting), two commits | A two-commit sequence adds report-start filtering and deterministic measurement selection, then aligns calculated BMI with the height printed in the report | `APP-DATA`: define temporal selection and cross-field consistency; this pair is one sequence, not two independent incidents |
+| Repo G (message triage), one commit | Processing follows the event's message ID instead of asking for the latest message, which can refer to a newer event | `IO-IDEMPOTENT`: preserve event identity through asynchronous processing |
+| Repo G (message triage), one commit | A frontend feature gate protects use of a new backend endpoint that was merged but not yet deployed | `DELIVERY-READY`: verify deployed compatibility and release order, separately from merge order |
+| Repo H (eligibility frontend), one commit | Cypress expectations change after an intentional initial-selection change from one medication to another | Counterexample to immutable assertions: preserve coverage while updating tests to an explicitly changed acceptance contract |
+| Repo H (eligibility frontend), one commit | Draft branch state is retained separately from saved active-branch values, with tests for excluding hidden notes from save | `STATE-DRAFT` and `INPUT-BOUNDARY`: check the persisted result, including omitted and inactive fields |
+| Repo H (eligibility frontend), two commits | Medication rendering gains an explicit flag guard; a later AI-preview change prevents save until the preview is resolved | `AUTH-BOUNDARY` distinguishes flags from permission; `STATE-ASYNC` separates suggested values from committed user intent |
+| Repo D, one commit | Semantic wrappers are removed from pass-through call chains while retained at a boundary with meaningful validation | `BRAND-SCOPE`: use domain types where they prevent a concrete error, without mandatory wrapper propagation |
 
 These examples support specific checks, not the effectiveness of the complete skill. The new application-design, security, integrations, and delivery guides also contain supplemental engineering judgment. Broader requirements for threat modeling, time budgets, idempotency, readiness, and recovery are useful production practices, but this audit does not supply an independent observed defect behind every clause. Keep that distinction when adapting or evaluating them.
 
-The skill's own history suggests a maintenance control: `6b6b7de` added production-session rules, `69f64b8` added checkable verification and consolidated authorities, and `fb5b867` added four guides while leaving several advertised reversals and cross-reference rules only in this evidence file. Evidence that changes a rule must update its executable guidance, trigger, and review path together. A provenance table alone does not change agent behavior.
+The skill's own history suggests a maintenance control: `6b6b7de` added production-session rules, `69f64b8` added checkable verification and consolidated authorities, and the four-guide commit added async, observability, LLM and dependency guides while leaving several advertised reversals and cross-reference rules only in this evidence file. Evidence that changes a rule must update its executable guidance, trigger, and review path together. A provenance table alone does not change agent behavior.
 
 ## Reproducing this
 
