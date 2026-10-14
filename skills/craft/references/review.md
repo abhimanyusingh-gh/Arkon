@@ -33,3 +33,19 @@ Fold confirmed in-scope findings, including small related fixes when warranted. 
 Re-review the whole changed behavior, not only the latest patch: a fold can regress an earlier fix or widen scope. Inspect changed tests as well as product code. Keep the final description aligned with the actual implementation.
 
 **REVIEW-ROUNDS — diagnose recurring patterns.** Stop repeating the same edit/review loop when the defect class recurs, a fix regresses, or untouched files keep producing findings. Revisit the contract, root cause, or slice. Round counts can trigger a checkpoint; they do not prove the work is correct or require abandoning a solvable task.
+
+## Rationalizations (author and reviewer side)
+
+Like verification, code review rationalizations often skip the actual check. Use these to spot them.
+
+| Thought | Reality | Rule |
+|---------|---------|------|
+| Verified zero consumers via grep | Grep is a lead, not a finding; it answers usage but not domain meaning | `REVIEW-DISCLOSED` |
+| Disclosed as a tradeoff in the PR body | Disclosure names the deviation; justification proves the design decision is sound | `REVIEW-DISCLOSED` |
+| The automated reviewer approved | Automated checks are evidence of coverage, not human judgment or stakeholder approval | |
+| Round 4, just merge | Recurring issues signal a contract/root-cause problem, not readiness | `REVIEW-ROUNDS` |
+| Add a catch or retry so the error stops | Diagnose the failure first; a catch that masks an unknown root cause will recur | `REPRO-FIRST` |
+| Only the last fold needs re-review | Folded changes can regress earlier fixes or widen scope; review the whole changed behavior | Fold and re-review |
+| The agent's summary says complete | Agent reports state what was attempted; they are data, not independent verification | `REVIEW-DISCLOSED` |
+| A grep hit is a finding | Grep is a search lead; inspect the context, reason, and reachability before reporting | |
+| I'd write it differently | Preference is a nit at most; enforce repository policy where it exists | |

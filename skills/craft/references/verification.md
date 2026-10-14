@@ -71,3 +71,19 @@ Update affected consumer/browser tests with the implementation when a change alt
 **Watch blanket assertions.** A spec asserting that no element of some kind exists breaks when an unrelated control legitimately becomes one. Structural changes break specs that never named the changed component, so the grep is over the suite, not over the specs you expect to be affected.
 
 Before declaring a complex application complete, walk its acceptance matrix through real composition: primary journey, authorization/scope denial, important failure/recovery path, and the production artifact checks relevant to this change. State which integrations remain mocked or unverified; do not infer production readiness from unit totals alone.
+## Rationalizations to reject
+
+When verifying completion, distinguish evidence from explanation. Rationalizations like these stand up to no inspection; instead, record the actual gate output and command.
+
+| Thought | Reality | Rule |
+|---------|---------|------|
+| 538 tests pass, so nothing regressed | A passing suite does not prove capability is retained; compare base and current to identify what was lost | `REGRESS-DIFF` |
+| I removed the failing test; the comment explains it | Deletion without replacement coverage or contract change is a blocker | `TEST-NODELETE` |
+| Docker or a browser isn't available, so call it passing | Absent capability is reported as not-run, never passed | `CLAIM-EVIDENCE` |
+| It passed earlier and my edit was small | Small edits regress capability; compare against base, not against memory | `CLAIM-EVIDENCE` |
+| The command started or timed out, so it's probably fine | Timeout, partial output or a still-running process is reported as pending, not green | `CLAIM-EVIDENCE` |
+| Grep shows no callers, so it is dead code | Unwired code is not automatic dead code; classify it before deleting | `DEAD-CAPABILITY` |
+| Unit tests pass, so the app boots | A test that supplies mocked context is not evidence of real composition | `HARNESS-MASK` |
+| The adapter is mocked, so integration works | A mocked dependency cannot prove production integration; verify with the real service | `CLAIM-EVIDENCE` |
+| The agent said it verified this | Automated reports are evidence of what the agent tried, not human verification or regression coverage | `CLAIM-EVIDENCE`, `REGRESS-DIFF` |
+| Too small for evidence | When a change is too narrow for unit/integration tests, record it in review prose or link the Evidence card from the delivery request | |
