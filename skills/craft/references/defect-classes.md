@@ -8,6 +8,7 @@ This is a set of priors from historical findings and operating experience, not a
 |---|---|---|
 | Scope or permission bypass | Can an untrusted/foreign identifier reach a read, write, aggregate, export, cache or blob? Does every actor class actually authorize? | `tenancy.md`, `security.md` |
 | Missing input boundary | Can arbitrary fields, destinations, payload sizes or model output become trusted domain state? | `security.md`, `llm-calls.md` |
+| Private data + untrusted content + outbound effect | Can a session access customer data, ingest external content and perform irreversible actions? What prevents instruction injection? | `security.md` |
 | Content in telemetry | Can a payload, nested exception message, stored failure or metric dimension disclose sensitive data? | `observability.md` |
 | Capability deleted with coverage | What did the base do that this revision no longer does? Does a literal replace a computation or a guard have no live producer? | `verification.md` |
 | Harness masks a broken composition | Does the test provide context/config missing from the real app? Does the packaged artifact start and exercise the changed path? | `verification.md`, `delivery.md` |

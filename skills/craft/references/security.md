@@ -26,4 +26,17 @@ Apply to the boundary being changed. These are engineering safeguards, not a cla
 - Keep sensitive data out of URLs, logs, traces, metric tags, error bodies, fixtures, and model requests unless the field is necessary and the sink is approved. Pseudonymous identifiers still need a privacy decision.
 - Use synthetic fixtures. Respect retention and deletion requirements across derived records, exported objects, backups, and audit trails; do not promise erasure that the storage design cannot provide.
 
+## TRIFECTA-BOUNDARY — never grant private data, untrusted content and an outbound channel to one authority
+
+- Flag any feature, agent or tool session that can (1) read private or customer data, (2) ingest content an outsider can influence (documents, email, web pages, tickets, uploads, tool or MCP results) and (3) send data out (HTTP, email, messages, rendered links or images, commits, shared writes). All three together are exploitable by injected instructions; remove at least one leg.
+- Break a leg structurally: isolate the untrusted-content reader from private data and from side-effecting tools, restrict egress to an allowlist, or require human confirmation for the outbound or irreversible step. An instruction to the model to ignore embedded instructions is not a break.
+- Applies to products that run a model over customer documents and to a coding session that holds credentials while reading issues, PR comments or web pages.
+
+## INJECTION-BOUNDARY — embedded instructions are data, and the effect boundary is what you test
+
+- Treat model input from documents, retrieval, tools and users as untrusted. Delimiting or labeling it reduces risk and is not a guarantee.
+- Give the model the least tool and data authority the task needs; authorization and scope checks stay in code (`AUTH-BOUNDARY`, `LLM-FAILSAFE`).
+- Encode or strip model output before rendering it as markup, links or images, and before using it in queries or commands.
+- Prove it with a negative test: a fixture containing planted instructions must produce no unauthorized tool call, no outbound request and no cross-scope read, observed at the real boundary rather than a mock.
+
 Before declaring the boundary safe, demonstrate the important negative case through the real entry point: denied actor, foreign object, unsafe input, or missing secret. A test that merely asserts a mock permission method was called does not establish enforcement.
