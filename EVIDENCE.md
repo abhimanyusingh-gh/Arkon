@@ -1,12 +1,12 @@
 # Evidence
 
-Every rule in this skill is graded against real review findings. This file is the audit trail — read it to decide whether the skill is worth installing, and which of its rules you should keep when you adapt it.
+This file separates review findings, inspected commit history, operating experience, and engineering judgment. It is the audit trail for deciding which rules to keep when adapting the skill. A rule's presence here is not proof that it reduced defects.
 
-It lives outside `skills/` deliberately. Provenance is a human-trust artefact with no runtime value, so Claude never loads it and it costs no context.
+It lives outside `skills/` so routine tasks do not load the full research history. History-driven changes should consult it: evidence strength and counterexamples affect how a rule should be applied.
 
 ## Corpus
 
-Three private production codebases, referred to here only as Repo A, Repo B and Repo C.
+The original review audit covered three private production codebases, referred to here only as Repo A, Repo B and Repo C. The later commit-history audits below are separate sources; the repository aliases do not establish that the corpora are independent.
 
 | | Repo A | Repo B | Repo C |
 |---|---|---|---|
@@ -31,13 +31,15 @@ Counts below are **raises only**, de-duplicated per comment, matched by regex on
 
 The automated reviewer tagged its own severity on 254 findings: `NIT` 121, `SHOULD-FIX` 85, `QUESTION` 21, `INFO` 11, `BLOCKER` 10, `CRITICAL` 5, `MUST-FIX` 1. That distribution is why this skill uses a three-level vocabulary rather than seven.
 
-## Rules, by evidence weight
+## Original rule-family signals
+
+This table preserves the original audit's reported counts and policy labels. It is not the current normative rule set: later revisions qualify stack-specific preferences, file budgets, immutable assertions, and deployment assumptions. The runtime references are authoritative for current behavior.
 
 | Rule family | Rule IDs | Findings | Distinct PRs |
 |---|---|---|---|
 | Design fidelity, tokens, design completeness | `frontend.md` fidelity | **70** | 48 |
 | Full unfiltered gates before push | `workflow.md` gates | **62** | 40 |
-| Code reuse and duplication | `REUSE-*` | **43** | 51 |
+| Code reuse and duplication | `REUSE-*` | **43** | not validated; reported 51 |
 | Scope isolation | `SCOPE-*` | **41+** | 25+ |
 | Layering | `LAYER-*` | **34** | 27 |
 | Docs ship with the change | `workflow.md` docs | **29** | 11–27 |
@@ -62,24 +64,26 @@ The automated reviewer tagged its own severity on 254 findings: `NIT` 121, `SHOU
 | No inline CSS | `frontend.md` styling | 6 | 5 |
 | Test value per PR | `testing.md` test value | 5 | 5 |
 | Covering index per query path | `INDEX-COVERING` | 3 | 3 |
-| Every manual bug becomes a test | `testing.md` bug→test | 3 | 5 |
+| Every manual bug becomes a test | `testing.md` bug→test | 3 | not validated; reported 5 |
 | Branded types | `authoring.md` type safety | 2 | 2 |
 | No pre-production backfill | `authoring.md` database | 1–2 | 2 |
 | Never re-pin an assertion | `testing.md` contract | **0** | 0 |
 | No rate limiting in application code | `authoring.md` | **0** | 0 |
 | Fleet orchestration, all rules | `orchestration.md` | **0** | 0 |
 
+The two unvalidated spreads above exceed their finding counts, which is impossible under the stated per-comment counting method. They are preserved as historical reports, excluded from quantitative ranking, and need a source-level recount. The original extraction and classification script is not included in this checkout.
+
 **The review loop is the strongest signal in the corpus and doesn't fit the table.** 382 author fold-replies across **179 distinct PRs** — 54% of every PR in the repo — plus 18 raises about the loop itself.
 
 Three secondary corroborations worth citing:
 
-- The dead-code check is named in **89 comments across 51 PRs** — the most consistently-run single gate step, which is why `DEAD-EXPORT` sits in the always-loaded non-negotiables.
+- The dead-code check is named in **89 comments across 51 PRs** — the most consistently-run single gate step, which motivated the original always-loaded `DEAD-EXPORT` rule. Current guidance also accounts for framework discovery and required capabilities.
 - Three PRs ran formal design-drift defect tables (`D1…D10`) against the design bundle. Design fidelity earned its status as a hard gate.
 - The corpus cites the origin project's own house-rule files 39 times across 15 distinct rules — an independent map of which rules were actually codified, and it agrees with the regex counts.
 
 ## What the data disproved
 
-Publishing the reversals matters more than publishing the confirmations. In each case the rule was **kept**, because a target that practice fell short of is still the right target — but the mechanism was rewritten so the rule is checkable rather than merely asserted.
+This table records the original audit and its response. These rules were retained as targets, with mechanisms rewritten to make them checkable. Retention was an engineering decision; observed compliance does not establish that a rule is necessary or effective. Later revisions must also consider deliberate product changes and deployment context.
 
 | Claim as written | What the data shows | What changed |
 |---|---|---|
@@ -93,7 +97,7 @@ Publishing the reversals matters more than publishing the confirmations. In each
 
 ## Recurring defects the skill did not previously cover
 
-These seven came out of the corpus and are new in this version. They are the reason the skill grew by half.
+These seven were added during the original corpus audit. Rule numbering and "new" labels in this historical table refer to that release.
 
 | Defect class | Evidence | Where it landed |
 |---|---|---|
@@ -152,7 +156,7 @@ What the skill added over the baseline:
 
 **What the baseline did better, and this matters:** it went deeper on framework-specific correctness — it caught an `expire_on_commit` trap that would raise in the caller after commit, and named the concrete failure modes for a shared module-level session. The skill run flagged the shared-session concern but missed the commit-expiry bug, and shipped fewer code snippets.
 
-Read honestly: on a small diff, a capable model already finds the correctness bugs without this skill. What the skill reliably changes is **coverage of the things a model skips** — indices, negative tests, seed data, folding discipline, severity language — not raw bug-finding depth. Anyone installing it for the latter should calibrate accordingly.
+On this one small diff, both arms found correctness bugs and the baseline found one the skill arm missed. The skill added coverage of indices, negative tests, seed data, folding discipline, and severity language. Whether those gains generalize requires repeated, held-out tasks; this run supports no reliability or effectiveness claim.
 
 ## Caveats
 
@@ -164,57 +168,85 @@ State these alongside any number from this file, or the numbers mislead.
 
 3. **Repo B is not a control.** 98 of its 101 PRs are dependabot, it has four-plus human committers against Repo A's effectively one, and it is polyglot rather than single-stack. Its two rework indicators point in opposite directions — 42% more `fix`-prefixed commits per unit of output, but 3× fewer explicitly rework-worded ones. It is a contrast, not a counterfactual.
 
-4. **Counting is regex-plus-reading, not adjudication.** Every count is reproducible from the corpus and every one is a judgement about what a comment was *about*. Treat the tiers as ordinal, not the integers as exact.
+4. **Counting is regex-plus-reading, not adjudication.** Classification is a judgment about what a comment was *about*. The original raw snapshot and classifier are not distributed here, so the aggregates cannot be independently reconstructed from this checkout. Treat the supported tiers as ordinal, not the integers as exact.
 
 5. **Fleet orchestration still has no *corpus* evidence.** Orchestrator behaviour doesn't surface in PR comments, so nothing in `orchestration.md` or `verification.md` is regex-counted. What changed in this version is that several of those rules now name a specific failure they were written after, in the Repo C table above — n=1 each, from one operator. That is better than assertion and much weaker than the frequency table. Adapt freely.
 
-6. **Repo C's numbers are self-reported, not reconstructed.** The counts in its table (538/538, 648, 18 failures) were recorded during the sessions rather than recovered from an API afterwards, so unlike every number above them they are not independently reproducible from the commands at the end of this file.
+6. **Repo C's numbers are self-reported, not reconstructed.** The counts in its table (538/538, 648, 18 failures) were recorded during sessions rather than recovered from an API afterwards. The commands below do not reproduce them.
 
-## Twenty rules from three repos, 9-week period
+## Twenty rule families from a reported 9-week audit
 
-Recent evidence from `document-criteria-matcher` (ME-97 prefill scheduler and prior work), `clinic-gateway` (dependency management), and `software-craftsmanship` (skill updates). Corpus: 122 commit lines (105 unique subjects), 4 PRs with teammate raises (DCM #22: 6 raises; #43: 9; CG #413: 4; #414: 1), 37 rework commits.
+Commit `fb5b867` reported evidence from `document-criteria-matcher` (ME-97 prefill scheduler and prior work), `clinic-gateway` (dependency management), and `software-craftsmanship` (skill updates): 122 commit lines (105 unique subjects), 4 PRs with teammate raises (DCM #22: 6 raises; #43: 9; CG #413: 4; #414: 1), and 37 rework commits. Those aggregate classifications were not independently reproduced in the later local-history review; they remain reported evidence, rather than verified incident totals.
 
-**Data corrections:** Not 7 months, 9 weeks (Aug 12 - Oct 14). Not 125 commits after removing git stash refs. Commit counts measure slicing, not frequency. Same-branch rework is self-detected, not a review finding. One author.
+**Scope and counting:** Aug 12–Oct 14 is 9 weeks, not the author's entire history. Commit counts measure slicing; subjects are not reliable deduplication keys. A claim/fence implementation, a test class, a review raise, and a corrective commit are different units. Same-branch rework is self-detected, not a review finding. Several commits can belong to one failure sequence. The ranks below are the original priorities, not a comparable frequency ranking.
 
-| Rank | Rule ID | Rule | Instances | Repos | Severity | Reference |
+| Priority | Rule ID | Rule | Reported signal | Repos | Severity | Reference |
 |---|---|---|---|---|---|---|
-| 1 | LOG-NO-CONTENT | Logs carry IDs, never exception messages or free text | 7 | DCM + CG | blocker | `observability.md` |
+| 1 | LOG-FAILURE / LOG-LENGTH | Keep sensitive content out of telemetry and error responses | 7 | DCM + CG | blocker on data-bearing paths | `observability.md` |
 | 2 | COMMIT-TRUTH | Commit subject describes diff; no same subject over different diffs | 6 | CG + DCM | should-fix | `workflow.md` |
 | 3 | JOB-LEASE | Exclusive job execution via database lease | 5 | DCM | blocker | `async-jobs.md` |
 | 4 | MIGRATE-ROLLING / MIGRATE-IMMUTABLE | Safe schema migrations for rolling deploys | 5 | DCM | blocker | `workflow.md` |
-| 5 | REPRO-FIRST | No error handling change without root-cause reproduction | 4 | DCM + CG | should-fix | `review.md` |
-| 6 | LOG-SENTINEL | Every catch site that logs has a PHI sentinel test | 11 test classes | DCM | should-fix | `observability.md` + `testing.md` |
-| 7 | DEP-PIN / DEP-SUPPRESS | Dependency overrides carry advisory ID, reason, removal condition | 4 | CG | should-fix | `dependencies.md` |
+| 5 | REPRO-FIRST | Establish the failing path and state reproduction limits before changing error behavior | 4 | DCM + CG | should-fix | `review.md` |
+| 6 | LOG-SENTINEL | Content-bearing failure sinks get meaningful leak-sentinel coverage | 11 test classes | DCM | should-fix | `observability.md` |
+| 7 | DEP-PIN-SUPPRESS | Overrides/suppressions carry rationale, applicable advisory, and removal condition | 4 | CG | should-fix | `dependencies.md` |
 | 8 | DEP-BOOT | Real app boots after upgrade; diff transitive tree | 3 | CG | blocker | `dependencies.md` |
-| 9 | LOCK-MINIMAL | No lock when row may not exist (MySQL gap-lock deadlock) | 3 | DCM | should-fix | `authoring.md` Database |
-| 10 | CONFIG-FAIL-CLOSED | Secrets get no production default; invalid config fails at startup | 4 | DCM | should-fix | `authoring.md` + **contradicts current CONFIG-DAY-ONE** |
+| 9 | LOCK-MINIMAL | Choose the smallest correct serialization mechanism for the actual datastore/isolation level | 3 | DCM | should-fix | `authoring.md` Database |
+| 10 | CONFIG-FAIL-CLOSED | Secrets get no production default; invalid config fails at startup | 4 | DCM | should-fix | `authoring.md` |
 | 11 | TEST-PIN | Characterization tests must fail when behaviour changes | 3 | DCM | should-fix | `testing.md` |
 | 12 | TEST-CONCURRENCY | Every exclusivity claim tested against real database | 5 test classes | DCM | should-fix | `testing.md` + `async-jobs.md` |
-| 13 | JOB-CLAIM / JOB-FENCE | Claim with token; finalize filters on id + token | 4 mechanisms | DCM | blocker | `async-jobs.md` |
+| 13 | JOB-FENCE | Claim with token; finalize filters on scope + id + token | 4 mechanisms | DCM | blocker | `async-jobs.md` |
 | 14 | JOB-RETIRE | Mark obsolete, not deleted; retire after complete crawl only | 3 | DCM | should-fix | `async-jobs.md` |
-| 15 | JOB-GATE + TEST-GATE | Gates checked cheapest first; one test per gate | 7 tests | DCM | should-fix | `async-jobs.md` + `testing.md` |
-| 16 | NAME-FULL | Collaborators named after type, no abbreviations | 3 | DCM | nit / should-fix | `authoring.md` NAME-* |
-| 17 | LLM-OUTPUT-UNTRUSTED | Model output checked against request; no echoing | 3 | DCM | should-fix | `llm-calls.md` |
-| 18 | LLM-CORRELATE / LOG-ID-NO-SECRET | Correlation ID = business key + stage + attempt | 3 | DCM | should-fix | `llm-calls.md` + `observability.md` |
-| 19 | LOG-UNTRUSTED-TEXT / LLM-PROMPT-MINIMAL | Log length only of model-supplied text | 2 | DCM | should-fix | `observability.md` / `llm-calls.md` |
+| 15 | JOB-GATE-ORDER / TEST-GATE | Gates checked cheapest first; one test per gate | 7 tests | DCM | should-fix | `async-jobs.md` |
+| 16 | NAME-FULL | Clear names in the repository's vocabulary; avoid ambiguous abbreviations | 3 | DCM | nit / should-fix | `authoring.md` NAME-* |
+| 17 | LLM-FAILSAFE | Model output checked against request and authorized domain constraints | 3 | DCM | impact-dependent | `llm-calls.md` |
+| 18 | LLM-CORRELATE / LOG-FIELDS | Privacy-reviewed correlation propagated through stage and attempt | 3 | DCM | should-fix | `llm-calls.md` + `observability.md` |
+| 19 | LOG-LENGTH / LLM-PROMPT | Minimize model inputs and log untrusted content safely | 2 | DCM | should-fix | `observability.md` / `llm-calls.md` |
 | 20 | BRAND-SCOPE | Brand only where mix-up is possible; avoid ceremony | 2 | DCM | nit | `authoring.md` Type safety |
 
 **Data that disproved existing rules:**
 
 | Earlier claim | What the data shows | Action |
 |---|---|---|
-| CONFIG-DAY-ONE: "every config service carries a hardcoded default" | Commit 79e5a62 removes all prod defaults; missing value means startup fails with ERROR | Split into CONFIG-FAIL-CLOSED; contradicts current text |
-| Branded types mandatory | Over-applied through CLAUDE.md rule; reverted in review (b85d2fd) | Refine BRAND-SCOPE in `authoring.md` |
-| TOUCH-BLAST | Broken repeatedly by its own author | Document gap; separate issue from craft rules |
+| CONFIG-DAY-ONE: "every config service carries a hardcoded default" | Reported DCM commit `79e5a62` removes production defaults; missing values fail startup | `CONFIG-FAIL-CLOSED` separates optional tuning defaults from secrets and required production configuration |
+| Branded types mandatory | Reported DCM review reversal `b85d2fd` after over-application through CLAUDE.md | `BRAND-SCOPE` requires a concrete mix-up risk; use the language's native domain types where appropriate |
+| TOUCH-BLAST | The audit reported violations by its own author | A written rule is not enforcement; check behavior against the base and distinguish cleanup from unrelated changes |
 
-**Known issues in the code (separate PRs):**
+**Issues reported at that audit's snapshot, not reverified as current defects:**
 - `ReferralController.java:45/:83/:85` return raw exception messages in HTTP error bodies
 - `CoachTaskManagerClientImpl.java:79` puts message into wrapping exception
 - `StructuredLogger` still has `warn`/`error(…, Throwable)` overloads
 
+## Local authored-history review, October 14, 2026
+
+The enhancement after `fb5b867` inspected the available authored history across local checkouts, rather than treating the 9-week subset as the entire history. This is a reachability inventory and a set of inspected examples, not a new defect-frequency study.
+
+| Source | Verified scope | Limits |
+|---|---|---|
+| This skill repository | Non-shallow; 7 commits reachable from the reviewed HEAD `fb5b867`, 13 unique objects across local branches, tags, and remote-tracking refs | Pre-squash branch commits and the resulting squash commits describe overlapping work; 13 objects are not 13 independent changes |
+| Other local checkouts under `/Users/abhimanyu/workspaces` | 41 repository/worktree directories, 40 common Git directories, 31 repository basenames; 18 basenames had commits matching the author's known identities | Repeated checkouts and worktrees are present; these are discovery counts, not counts of independent applications |
+| Authored commits in those other checkouts | 953 globally distinct hashes, July 9–October 14; 913 non-merge; 907 after excluding 6 non-merge stash-like snapshots; 539 nonempty stable patch IDs; 486 distinct exact subjects | Excludes this skill repository. Hashes, patch IDs, and subjects count different things; none counts defects or independent incidents |
+
+The inventory used locally reachable `--all` refs, recorded commit identities and parent hashes, and deduplicated hashes across checkouts. It did not fetch remotes or inspect deleted branches, reflogs, or unavailable repositories. An empty patch ID is excluded from the patch count; matching patch IDs help identify repeated patches, not semantic equivalence. Attribution depends on recorded author identities. This is the available local history, not a claim to have inspected the author's entire remote history.
+
+Selected verified examples:
+
+| Repository and commits | What the inspected diff establishes | Guidance it informs |
+|---|---|---|
+| `clinical-case-report`: `8b5c8771b112`, `6057dac69bfa` | A CCR-609 sequence adds report-start filtering and deterministic measurement selection, then aligns calculated BMI with the height printed in the report | `APP-DATA`: define temporal selection and cross-field consistency; this pair is one sequence, not two independent incidents |
+| `message-triaging`: `570c5a68b337` | Processing follows the event's message ID instead of asking for the latest message, which can refer to a newer event | `IO-IDEMPOTENT`: preserve event identity through asynchronous processing |
+| `message-triaging`: `4912d71ead2d` | A frontend feature gate protects use of a new backend endpoint that was merged but not yet deployed | `DELIVERY-READY`: verify deployed compatibility and release order, separately from merge order |
+| `medication-eligibility`: `3b3e7ed63a01` | Cypress expectations change after an intentional initial-selection change from Wegovy to Tirzepatide | Counterexample to immutable assertions: preserve coverage while updating tests to an explicitly changed acceptance contract |
+| `medication-eligibility`: `79ba9ac15b25` | Draft branch state is retained separately from saved active-branch values, with tests for excluding hidden notes from save | `STATE-DRAFT` and `INPUT-BOUNDARY`: check the persisted result, including omitted and inactive fields |
+| `medication-eligibility`: `62435aab6d4a`, `a0cd79ff44ab` | Medication rendering gains an explicit flag guard; a later AI-preview change prevents save until the preview is resolved | `AUTH-BOUNDARY` distinguishes flags from permission; `STATE-ASYNC` separates suggested values from committed user intent |
+| `document-criteria-matcher`: `b85d2fd01323` | Semantic wrappers are removed from pass-through call chains while retained at a boundary with meaningful validation | `BRAND-SCOPE`: use domain types where they prevent a concrete error, without mandatory wrapper propagation |
+
+These examples support specific checks, not the effectiveness of the complete skill. The new application-design, security, integrations, and delivery guides also contain supplemental engineering judgment. Broader requirements for threat modeling, time budgets, idempotency, readiness, and recovery are useful production practices, but this audit does not supply an independent observed defect behind every clause. Keep that distinction when adapting or evaluating them.
+
+The skill's own history suggests a maintenance control: `6b6b7de` added production-session rules, `69f64b8` added checkable verification and consolidated authorities, and `fb5b867` added four guides while leaving several advertised reversals and cross-reference rules only in this evidence file. Evidence that changes a rule must update its executable guidance, trigger, and review path together. A provenance table alone does not change agent behavior.
+
 ## Reproducing this
 
-Every number above comes from read-only GitHub API calls against the two repositories:
+For the original PR corpora, these read-only API calls acquire source records. They do not reproduce the historical snapshot, the regex classification, session reports, or commit-history aggregates by themselves:
 
 ```bash
 gh api --paginate 'repos/<owner>/<repo>/pulls/comments?per_page=100'
@@ -222,3 +254,15 @@ gh api --paginate 'repos/<owner>/<repo>/issues/comments?per_page=100'
 gh pr list --repo <owner>/<repo> --state merged --limit 400 \
   --json number,title,changedFiles,additions,deletions,mergedAt,body,reviews
 ```
+
+For commit-history work, the bundled `skills/craft/scripts/history_inventory.py` accepts explicit `--root` and `--author` arguments; `--manifest --patch-ids` adds ref/hash coverage and patch-equivalence measures without raw commit bodies. Discovery stops at a repository; provide nested repositories as additional roots. Stash-like subject classification is heuristic. Retain those limits along with identity matching, ref/HEAD snapshot, and exclusions. Inspect actual diffs for each cited case; repeated subjects and corrective wording are leads, not findings. Example read-only checks within a checkout:
+
+```bash
+git rev-parse --is-shallow-repository
+git for-each-ref --format='%(refname) %(objectname)'
+git log --all --format='%H %P %aI %an <%ae> %s'
+git show --format=fuller <commit>
+git show --no-ext-diff --format= --binary <commit> | git patch-id --stable
+```
+
+To test whether the skill helps, use held-out base/fix cases across stacks and repeat both skill and baseline runs. Record correct findings, missed defects, false positives, regressions introduced while fixing, and cost. Keep deliberate product changes as counterexamples. Commit counts, greener suites, or fewer review rounds alone cannot establish improvement.
