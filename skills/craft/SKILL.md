@@ -1,95 +1,91 @@
 ---
 name: craft
-description: Engineering standards for any code work on any stack — writing production code, slicing and reviewing PRs, authoring tests, running gates, merging, and running agent fleets. Load before touching code, not after review flags it.
+description: Build, change, and review production applications with explicit requirements, coherent architecture, safe data boundaries, and demonstrated behavior. Use for application development, complex features, refactors, debugging, and engineering reviews on any stack.
 ---
 
 # Craft
 
-## The non-negotiables (apply always, no reference read needed)
+Use this skill to turn a product request into working, verifiable software. Scale the process to the risk: a local fix needs a short investigation; a complex application needs explicit contracts and an incremental delivery plan. User instructions and repository requirements take precedence over these defaults. This skill grants no permission to publish, deploy, contact people, or mutate external systems.
 
-1. **Scope isolation.** Every read, write, aggregate, export, and storage path filters on the full `<scope-key>`, enforced at the lowest layer that can rather than at N call sites. A dropped scope key is a cross-customer data leak: blocker, never a nit.
-2. **Reuse before writing.** Search for an existing implementation first; extend or parameterize rather than clone. Name every reused symbol on the contract card. Duplicated logic: 2× → should-fix, 3× → request-changes.
-3. **No narrative comments.** The code is the doc. Comment only a genuinely non-obvious *why* — a hidden invariant, a known workaround, a surprising external constraint. No file-header docstrings, no "TODO until the issue lands".
-4. **Const-as-enum over repeated string literals.** Any fixed variant set gets a named constant object plus derived type, in preference to a language `enum` keyword. Consume the exported enum; never re-type its values.
-5. **No raw `string` for semantic values.** Branded types for IDs and domain primitives, const enums for finite value sets. Grep for the existing brand before creating one.
-6. **Export only what has an in-PR consumer** — no speculative exports, no barrels nothing imports through. But when a dead-code tool flags something, **classify before deleting**: scaffolding is deleted, a spec-required capability is wired to its consumer in the same PR. Deleting a capability is not cleanup.
-7. **YAGNI.** Nothing beyond what the issue requires. No speculative props, no single-caller indirection, no "while I'm here" expansions.
-8. **Debloat on touch.** Editing a file means scanning the surrounding 50–100 lines for dead code, duplicated logic, repeated literals, oversized functions, mixed concerns. Fix or flag in the same commit.
-9. **Deliberate before coding.** Produce an edge-case checklist, then a one-paragraph plan stating what's guarded and what's deliberately not done — before implementation.
-10. **Tests define the product.** A red test is fixed in product code, seed data, or config. Never re-pin an assertion — the only sanctioned edits *to an assertion* are compile-blocking typos, framework misuse that never caught a bug, and stripping banned patterns. Removing a test is a separate question with a separate bar: `TEST-NODELETE`.
-11. **Full unfiltered gates before push.** Never scope the test run to changed files as the gate. If anything is red, don't push.
-12. **Docs ship in the same commit as the change they describe.** No "docs follow-up later."
-13. **Raise and stop.** Auto-merge is off by default: run the full review loop, then surface the PR for the owner to merge.
-14. **Evidence over assertion.** Every claim of compliance carries the command and its actual output. A green suite is not evidence that nothing regressed — deleting or weakening a test to reach green is a blocker, and a comment explaining a removal is the tell, not the justification. `references/verification.md` carries the checks.
+## Working invariants
 
-**Severity vocabulary**, used everywhere: `blocker` (must not merge — data leak, deleted capability, broken contract), `should-fix` (fold into this PR), `nit` (advisory, may be filed).
+1. **Preserve intent.** Name the requested outcome and existing behavior that must survive. Trace requirements to running code and meaningful checks. Never delete a capability or weaken its test just to obtain green gates.
+2. **Protect boundaries.** Derive identity and customer scope from trusted authentication. Enforce authorization at the data/action boundary, including jobs, exports, caches, and storage. A cross-customer leak is a blocker.
+3. **Ground decisions.** Read the repository's instructions, callers, tests, schema, and CI before choosing patterns. Search for reuse; prefer the existing coherent design over a new parallel framework.
+4. **Keep changes coherent.** Implement one useful slice at a time. Preserve unrelated behavior; flag adjacent cleanup rather than expanding scope. Choose the simplest design that satisfies the actual constraints.
+5. **Make invariants explicit.** Use the language's native types, schemas, and database constraints. Brand or wrap values where a real mix-up is possible; reuse existing finite-value types. Type assertions do not validate external input.
+6. **Design failure paths.** Bound external work and retries; specify partial failure, concurrency, duplicate delivery, and recovery before adding side effects. Do not claim exactly-once behavior from a lease alone.
+7. **Prove behavior.** Run the applicable repository gates and report their actual output, skips, and limitations. Verify real composition and lost capabilities as well as individual units. An unrun check is never a pass.
+8. **Keep sensitive content out of telemetry.** Validate external input and model output; minimize disclosed data. Security and privacy guarantees require negative tests at the relevant boundary.
+9. **Deliver within authorization.** Keep docs current, use truthful commits, and respect existing approval and branch-protection rules. Commit, push, open a PR, merge, and deploy only within the user's authorized scope. Never add assistant attribution or co-author trailers.
 
-## The contract card
+Severity: `blocker` means unsafe or broken behavior that must not ship; `should-fix` belongs in this change; `nit` is advisory. Severity follows demonstrated impact, not the number of style violations.
 
-Paste this into every brief. The agent returns it filled in — that return is the deliverable, alongside the code.
+## Application workflow
 
-```
+For a new application or work spanning multiple boundaries, read `references/application-design.md` first.
+
+1. **Discover.** Bind the real stack and environment. Identify acceptance criteria, protected behavior, and unknowns. Ask only about decisions whose answers would materially change the implementation; continue independent work.
+2. **Design the risky seams.** State ownership, contracts, data invariants, and failure behavior. Verify an uncertain integration with the smallest useful spike. Use `references/history.md` when deriving standards from commit history; distinguish observed fixes from preferences.
+3. **Build a vertical slice.** Connect a real entry point through business logic and persistence to an observable result. Run focused checks while iterating, then add the next slice. Avoid completing every layer before any user journey works.
+4. **Verify and deliver.** Compare against acceptance criteria and the base revision, run applicable full gates, and check the production artifact and rollout when relevant. Report omissions and blockers by name; do not present scaffolded or mocked integrations as complete.
+
+## Evidence card
+
+Use this compact return format for substantial work and agent handoffs; a small fix can report the same evidence in prose. Omit irrelevant rows with a reason rather than inventing work.
+
+```text
 CRAFT CONTRACT
-
-  References read     craft + [which ones]
-  Scope               N files (cap M): [paths]
-  Reuse               extended <symbol> | new because <reason>
-  Scope key           every read/write filters on <key> | N/A, no customer data
-  Capability check    REGRESS-DIFF vs base, output pasted | N/A, no existing code changed
-  Tests               N passed / N failed / N skipped (baseline N)
-  Gates               <command> → <actual output line>, one row per gate
-  Tests deleted       none | <name>, subsumed by <name>
-  Not done            [deliberate omissions]
+  References read     craft + [relevant references]
+  Acceptance          criterion -> implemented path -> test or observed result
+  Scope / reuse       changed boundaries; reused symbols or reason for new code
+  Safety              scope/auth invariant; failure/recovery behavior | N/A: reason
+  Capability check    base revision; preserved/changed/removed behavior + evidence
+  Tests changed       named contract change or replacement coverage | none
+  Gates               command -> result/counts/skips; revision tested
+  Not run             check -> reason and remaining uncertainty | none
+  Delivery            migration/rollout/recovery evidence | N/A: reason
+  Not done            explicit omissions and consequences | none
 ```
 
-Three rules make it worth pasting:
-
-- **A row holding an adjective is read as not-done.** "All tests pass" is not a value; `1331/1331, 10 skipped` is. "Followed the rules" is not a value; a list of references is.
-- **`NOT RUN: <reason>` is a legal gate row.** An environment-blocked gate is a hole in the evidence, reported by name. Omitting the row is the failure, not the blocked gate.
-- **The card replaces pasting these rules verbatim into briefs.** Long briefs bury their own invariants and correlate with scope sprawl. Point at the skill, paste the card, keep the brief short.
-
-Every spawned agent **invokes `craft` itself as its first action** and names the references it read. A paraphrase in a brief is not a substitute — an agent that starts without loading the rules drifts immediately, and the drift is fluent enough to read as compliance.
+A row containing only “done,” “safe,” or “all tests pass” is unfilled. `NOT RUN: <reason>` is valid evidence of a limitation. Re-run checks affected by later changes and identify which revision each result covers. Read `references/verification.md` when assessing an agent's completion claims.
 
 ## Project bindings
 
-Rules are written against capabilities, not tools. Derive these from the repo on first use — the lockfile, the task-runner scripts, the CI workflow, the schema — and record them in the project's `CLAUDE.md`. Never assume them.
+Derive these from the actual repository; keep them in working notes or an existing project-approved location. Do not create or rewrite instruction files merely to use this skill.
 
-```
-<pm>          package-manager / task-runner invocation
-<typecheck>   whole-program type check, per workspace
-<unit>        full unfiltered unit + integration suite, per workspace
-<build>       production build, per workspace
-<deadcode>    dead-export / unused-dependency check, if the repo has one
-<e2e>         browser end-to-end suite
-<shared>      the shared package other workspaces compile against
-<workspaces>  the deployable units
-<query-lib>   the server-state cache library
-<store>       the client-state store
-<db>          the datastore and its query vocabulary
-<tracker>     the work-item system and its id format
-<remote>      the canonical git remote
-<scope-key>   the field that partitions data between customers
+```text
+Commands      package/task runner; typecheck; unit/integration; build; e2e; lint/deadcode
+Boundaries    deployable units; shared libraries; API/event consumers; external services
+Data          datastore/version; migrations; customer scope key; retention; test isolation
+Runtime       startup/readiness; config/secrets; background workers; telemetry
+Delivery      CI; base revision/remote; deployment topology; rollback mechanism
+Product       acceptance criteria; design source; tracker/issue when one exists
 ```
 
-## Which reference to read
+## References — load when the work reaches that boundary
 
-Read on the trigger, before starting — not after review flags it.
+Read relevant references before designing or changing that boundary. A task may need several, loaded as needed rather than all at once. Examples and historical fixes are not universal stack requirements.
 
 | Trigger | Read |
 |---|---|
-| Any query, write, storage path, or cache key touching customer data | `references/tenancy.md` |
-| Production code — types, config, naming, complexity, dead code, layering, indices | `references/authoring.md` |
-| Any UI work | `references/frontend.md` |
-| Any interactive component, form, dialog, or announcement | `references/accessibility.md` |
-| Any test, unit through e2e | `references/testing.md` |
-| Before any push, and whenever an agent reports work complete | `references/verification.md` |
-| Reviewing a diff | `references/defect-classes.md`, then `references/review.md` |
-| Folding review findings | `references/review.md` |
-| Slicing PRs, multi-PR migrations, gates, merge, docs | `references/workflow.md` |
-| Running an agent fleet | `references/orchestration.md` |
+| New application, complex feature, architecture or domain design | `references/application-design.md` |
+| Deriving conventions from commit history or adapting this skill | `references/history.md` |
+| Authentication, permissions, public input, uploads, URLs, secrets | `references/security.md` |
+| Customer data, queries, storage paths or cache keys | `references/tenancy.md` |
+| Production code, types, naming, config, layering or indices | `references/authoring.md` |
+| External API, event consumer, transaction spanning a side effect | `references/integrations.md` |
+| UI state, visual design or client data flow | `references/frontend.md` |
+| Interactive components, forms, dialogs or announcements | `references/accessibility.md` |
+| Scheduled job, poller, queue, claim, lease or manual trigger | `references/async-jobs.md` |
+| Logs, exception handling, metrics, traces or error bodies | `references/observability.md` |
+| External model call, prompt, output validation or AI-assisted action | `references/llm-calls.md` |
+| Dependencies, platform upgrades, advisories or suppressions | `references/dependencies.md` |
+| Writing or changing tests | `references/testing.md` |
+| Verifying completion, refactoring or preparing delivery | `references/verification.md` |
+| Reviewing a diff or folding findings | `references/defect-classes.md`, then `references/review.md` |
+| PR slicing, migrations, gates, commits or merge | `references/workflow.md` |
+| Runtime startup, performance, deployment or recovery | `references/delivery.md` |
+| Delegating independent work or coordinating agents | `references/orchestration.md` |
 
-Authoring a UI feature usually means `frontend.md` + `accessibility.md` + `testing.md`. A backend feature usually means `tenancy.md` + `authoring.md` + `testing.md`. Any refactor of existing code adds `verification.md`.
-
----
-
-Distilled from review findings and PR history across production codebases. The evidence behind each rule — instance counts, and the claims the data disproved — is published in `EVIDENCE.md` in the repository, deliberately outside this skill so it costs no context here.
+Evidence and its limits live in the repository's `EVIDENCE.md`; do not load it for routine coding. This skill aims to improve decision coverage; correctness still requires execution and independent review.

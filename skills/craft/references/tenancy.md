@@ -6,9 +6,9 @@ Read this before writing the query, not after review flags it.
 
 ## SCOPE-QUERY — every read and write carries the scope key
 
-Every query, update, delete, aggregate, and count filters on the scope key. Not "the caller already checked" — the filter is on the query. A query object built without it is a cross-customer data leak: **blocker**, never a nit, never a follow-up.
+Every query, update, delete, aggregate, and count is constrained to the authorized scope. Enforce this in the query/repository or a verified datastore policy such as row-level security; a caller's prior lookup alone does not protect later writes. A reachable unscoped operation exposing another customer's data is a **blocker**.
 
-- The scope key is the first field of the filter and the first field of the covering index.
+- Include the full scope in predicates/policies. Predicate text order does not enforce isolation; choose index order from the actual query plan (`INDEX-COVERING` in `authoring.md`).
 - Aggregations match on the scope key in the first stage, before any join or lookup. A join into an unscoped table re-widens the query — scope the joined pipeline too.
 - Bulk, batch, export, report, and admin paths are not exempt. An unscoped bulk write is the worst version of this bug, not an acceptable one.
 - With a composite scope key, filtering on the inner half alone is still a leak. `{ clientOrgId }` without `{ tenantId }` trusts that inner ids never collide across tenants.
@@ -20,9 +20,9 @@ Do not rely on N call sites remembering. Put the invariant where it cannot be fo
 
 - a repository layer taking the scope as a required first argument and injecting the filter; or
 - a pre-save / pre-query hook on every model owning a scope key; or
-- a schema-required scope field plus a write guard that throws when it is absent.
+- a verified datastore policy applied to the application's actual database role. A required scope field/write guard helps inserts but alone does not protect reads or cross-scope updates.
 
-**Enumerate every model that carries a scope key and check the whole list.** Spot-fixing only the model in the diff is how this defect survives — the sweep is the fix. Say in the PR body how many models you enumerated and how many needed the guard.
+Enumerate the models and operations governed by the boundary being changed, including joins and indirect paths. A systemic guard change needs systematic coverage. Report other gaps without silently expanding a local task into unrelated rewrites.
 
 ## SCOPE-REGRESS — a re-introduced scope violation is a blocker
 
@@ -48,19 +48,19 @@ A shared authorization helper that returns without checking for some class of ca
 
 When an endpoint accepts client-supplied filters alongside an actor-derived boundary, the effective scope is the intersection. A filter must never be the thing that grants access.
 
-- A caller class carrying no inherent boundary of its own is **required** to supply a narrowing filter — never defaulted to unbounded. Unbounded is not "allowed to see everything"; it means the request cannot be safely served and must be rejected.
+- A caller with no authorized boundary is rejected unless an explicit privileged capability grants the requested cross-scope action. A supplied filter alone cannot create permission.
 - A lookup endpoint taking `?patientId=` chosen by the caller lets the caller name its own scope. Invert it: the boundary derives from the authenticated actor, and filters only intersect within it.
 
 ## SCOPE-OPAQUE — not-found and not-permitted are indistinguishable
 
-On lookup-by-identifier, "does not exist," "is soft-deleted," and "exists but is outside your boundary" return the same not-found response. Distinguishing them lets a caller enumerate identifiers and confirm the existence of records in other scopes.
+For object lookup, use the project's non-disclosure policy so missing and foreign objects do not reveal cross-scope existence. A common policy returns the same not-found response for both. Preserve the authentication contract (such as missing/expired credentials) separately.
 
 - The authorization failure is converted to not-found at the boundary, never propagated as a distinct status.
 - Honest tradeoff: a legitimate caller debugging a permissions problem sees not-found rather than forbidden.
 
 ## SCOPE-PATH — object storage, file paths, and cache keys are scoped too
 
-Blob keys, upload prefixes, export filenames, and cache keys embed the scope key: `uploads/<scope>/<entity>/<id>`, never `uploads/<entity>/<id>`. Ownership is verified from the path's scope segment on read, not from the requested id alone. A signed URL over an unscoped path is the same leak with a longer half-life.
+Bind object storage and export access to verified scope ownership, using scoped keys or equivalent trusted ownership metadata/policies. A scope segment is organization, not proof of permission. Authorize before issuing a narrowly scoped, expiring signed URL; never infer ownership solely from a caller-supplied path or opaque id.
 
 Cache and query keys include the scope key too, or one customer's response is served to another on a shared key.
 

@@ -1,77 +1,35 @@
 # Reviewing
 
-## Every PR gets a reviewer. Mandatory.
+Review the requested diff against its requirements, callers, tests, and running assumptions. Use independent review for substantial or risky changes when available. Small reversible edits need proportional verification, not a mandatory fleet or external review thread.
 
-No exemption for small, obvious, hotfix, or docs-only PRs. The moment an author reports "PR raised", the **very next tool call in the same response** dispatches the reviewer — reflexive, not reasoned. It runs in parallel with human review.
+## Correctness before conventions
 
-The only acceptable skips: a pure rebase or branch-sync commit with no diff, or an explicit instruction to skip this one.
+Start with the behaviors that can fail: authorization/scope, state transitions, data consistency, concurrency, external side effects, compatibility, and capability preservation. Then assess maintainability and local conventions. Use `defect-classes.md` as a prior; inspect domain-specific references when their trigger appears.
 
-It holds even for trivial PRs because the reviewer's value is the second opinion, not just bug-catching. Hotfixes shipped unreviewed turn out not to be one-line fixes; docs-only PRs carry broken references and drift. Skipped reviews mean issues surface later as owner-filed nits, or never surface and rot.
+On a refactor, read `verification.md` and compare the base implementation. A removed capability together with its test can leave the suite green. Trace one real producer and consumer through changed seams; do not infer reachability from a mocked method call.
 
-An automated reviewer is a real reviewer for this purpose — but it is not a human approval, and a PR that only ever had automated review should say so when it is surfaced for merge.
+**REPRO-FIRST — establish the failing path before changing error behavior.** Reproduce with the actual input/stack when feasible, or provide a minimal failing test or concrete control-flow evidence. Distinguish root cause from symptom and state what remains unproven. Do not add catches, defaults, retries, or dependency changes merely to silence an unexplained failure.
 
-## What to review
+Verify load-bearing claims against the right source: behavior against code/tests, gate results against actual output and revision, compatibility against deployed versions, external assumptions against the contract. If evidence is unavailable, report the limit; unavailable evidence alone does not establish a product defect.
 
-**Walk `defect-classes.md` in frequency order.** It carries each class, the concrete shape to look for, its severity floor, and the rule it maps to. That list replaces per-dimension tabulation: report the classes that produced a finding and say nothing about the rest.
+**REVIEW-DISCLOSED — a disclosed deviation still needs justification.** “Verified zero consumers” answers usage, not domain meaning; “noted as a tradeoff” does not justify unrelated behavior changes. Ask whether the change belongs in scope and preserves the intended contract, then assess its rationale. Apply this equally to fluent agent reports.
 
-**On any refactor, run `verification.md` before reading the diff.** Three defect classes are invisible in a diff because they are defined by what is missing — a capability deleted along with the test that proved it, a harness masking a boot failure, markup changed without its specs. Reviewing only what is present cannot find them, and the gates will be green.
+For each finding, name the trigger and concrete failure, point to the smallest relevant location, explain the impact, and suggest a feasible correction. A grep hit is a lead, not a finding. Do not report a hypothetical edge case with no reachable path or demand a personal style preference contrary to the repository.
 
-Beyond the class list, verify the load-bearing claims of the PR body actually hold — gate numbers, the migration's remaining-consumer list, the design-source citations. A body claim you cannot verify from the diff is itself a finding. The reuse and reference-read claims live on the contract card rather than the body, so they are the orchestrator's to check, not the PR reviewer's.
+Severity follows impact: unsafe cross-customer access, lost required capability, unguarded irreversible effects, or a breaking deployed contract are blockers. Other demonstrated correctness failures should be fixed before readiness. Style and heuristic thresholds remain advisory unless repository policy makes them requirements.
 
-**REVIEW-DISCLOSED — a disclosed deviation is not an approved one.** "Flagged in the PR body," "verified zero consumers," "noted as a tradeoff" establish honesty, not correctness. Review the change exactly as if it had been silent. An articulate justification reads as diligence and tempts the reviewer to relay the flag onward instead of asking whether the change belonged in the diff at all — ask that question, not whether the tradeoff is acceptable. A disclosed change to an unrelated path is still unrelated. Applies with extra force to agent output, where a fluent self-justification is cheap and costs the author nothing. The review-side counterpart to `TOUCH-BLAST`: that rule keeps the change out of the diff, this one catches it when the disclosure talks a reviewer past it instead.
+## Review communication
 
-**Severity:** multiple correctness or duplication failures → request-changes. A single one → should-fix. Borderline style (a 51-LOC function against a 50 threshold) → nit, advisory. A dropped scope key, a deleted capability, a deleted shape with a live consumer, or an unbounded in-memory sort is a blocker regardless of how small the diff is.
+Lead with the most important actionable result. Use concise prose or a numbered list when findings are easier to scan that way; follow the platform's required schema if one exists. Group duplicate causes rather than creating a finding for every occurrence.
 
-## Write reviews as prose
+Each finding includes location, failure conditions, consequence, and a concrete suggestion. Distinguish bugs from optional improvements and confidence limits. If no actionable defect is found, say so and identify material verification gaps without inventing findings.
 
-**No verdict header. No Y/N tabulation. No labelled audit-line blocks.** A review that reads like a compliance form gets ignored.
+Keep operator-sensitive/private content out of published comments. Do not post a review, resolve threads, change tracker state, or impersonate a reviewer without authorization. An automated second opinion is useful evidence, not human approval.
 
-Shape: one paragraph carrying the call embedded in a sentence, then numbered nits with `file:line` and concrete suggestions, then optional brief notes (informational findings, baseline verification).
+## Fold and re-review
 
-Instead of:
-> Verdict: FOLD-THEN-SHIP
-> - Inline-cast audit: grep → 0 matches. Helper discipline holds.
-> - Helper validation: rejects empty (Y/Y). Enforces pattern AND sequential check (Y).
-> - Boundary completeness: all cast raw → branded via helpers. No slip-throughs found.
+Fold confirmed in-scope findings, including small related fixes when warranted. Decline a false positive with evidence; record intentional deferrals and their consequences instead of silently dropping them. Re-run checks affected by each fold.
 
-Write:
-> Branding looks solid — every boundary I walked casts via the helpers, and the read paths re-brand on retrieval so the loose schema type holds up. One thing to fold before merge: the integration suite doesn't compile against the narrowed types, and since a compile failure is a gate failure it has to land in the same PR. The same pattern is already applied in the sibling suite — copy the import and helper-wrap the constants.
->
-> Nits:
-> 1. `types/branded.ts:95` — the fingerprint helpers reject only the empty string; whitespace and runaway lengths slip through. Suggest a trim check plus a length cap.
+Re-review the whole changed behavior, not only the latest patch: a fold can regress an earlier fix or widen scope. Inspect changed tests as well as product code. Keep the final description aligned with the actual implementation.
 
-Keep the substance and the length. Change the voice. Concrete nits keep their numbered structure — that part is already useful.
-
-**No bot-identity framing.** Drop opening prefixes and footers about how the comment was posted. A reader shouldn't perceive scaffolding around the prose. The mechanics of posting under a distinct reviewer identity are fleet plumbing — see `orchestration.md`.
-
-**When line references would be noise, report to the orchestrator instead of the PR.** Full findings go back to the dispatching thread, which decides what to surface and what to dispatch as a fold. Post to the PR only when a specific finding needs to be traceable there for other humans — one short sentence, not a full review.
-
-## Fold ALL reviewer items into the same PR
-
-Critical, should-fix, nits, and test gaps — **one fold agent gets the whole punch list.** Never pre-split into "fold these now / file the rest as follow-ups": that's exactly how a backlog grows exponentially, and modules carrying money, compliance, or derived-value logic accumulate latent bugs fastest when "we'll fix later" piles up. The PR is whatever size the punch list dictates.
-
-Deferral needs explicit owner approval and is limited to:
-- An item requiring a new product decision the owner has to make.
-- An item blocked on another in-flight PR's merge.
-- An item genuinely larger than the rest of the PR combined — surface the trade-off ("this adds a new service and needs its own design; fold or defer?") and let the owner choose.
-
-Anti-patterns: cherry-picking 3 of 10 items to "keep this PR small"; splitting nits and test gaps into a later "polish wave"; filing follow-up issues for items that fit in the current diff.
-
-Fold agents stay strictly scoped to the findings (no scope creep), push to the **same branch** so the PR updates in place, and run the full gate sequence before pushing.
-
-## Re-review after every fold
-
-**Every fold triggers a fresh full-PR review** — not a review of the fold delta. Read the whole diff end to end, verify the folds landed correctly, and audit the rest at the same depth as the first pass.
-
-Full scope matters because a fold can regress files outside its own lines (a renamed identifier propagating wider than the fold author noticed), and the original reviewer may have missed something on the first pass. A narrow re-review is too lossy. **Skipping the re-review means shipping the fold blind.**
-
-The loop: review → fold → re-review → (fold → re-review) → clean. Every iteration is full-PR. Track where each PR sits in that loop.
-
-**REVIEW-ROUNDS — expect two rounds; escalate on the pattern, not the count.** Two is typical and a third is unremarkable. Don't stop reviewing because a round budget expired, and don't read a 4th round as evidence the reviewer is pedantic. Escalate to the owner when the *shape* is wrong:
-
-- Round N raises a defect class round N−1 also raised → the folds are treating symptoms. Demand the structural fix.
-- A fold re-introduces a previously-fixed defect → blocker. Stop folding and re-scope.
-- New findings still arriving in untouched files at round 4+ → the PR is too large. Split it.
-- Rounds producing only nits → close the loop and file them.
-
-Past 6 rounds, stop and re-scope by default. Long loops are usually mis-sliced PRs, not thorough reviews.
+**REVIEW-ROUNDS — diagnose recurring patterns.** Stop repeating the same edit/review loop when the defect class recurs, a fix regresses, or untouched files keep producing findings. Revisit the contract, root cause, or slice. Round counts can trigger a checkpoint; they do not prove the work is correct or require abandoning a solvable task.

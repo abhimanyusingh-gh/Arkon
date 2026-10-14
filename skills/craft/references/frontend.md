@@ -1,122 +1,56 @@
 # Frontend
 
-Rules are ordered by how often the defect actually occurs, most frequent first. Interactive components also need `accessibility.md` — a11y findings are correctness findings and belong to the functional pass, not the design pass.
+Use the existing framework and design system. Interactive work also reads `accessibility.md`. Treat behavior, accessibility, and visual fidelity as parts of the same feature; split delivery only when each slice remains useful and safe.
 
-## Design fidelity
+## Design fidelity and completeness
 
-**The design source is ground truth — a 1:1 translation target, not an inspiration.** DOM hierarchy, class names, density, content slots, ARIA attributes. When the current frontend and the design diverge, fix the frontend. "A prior PR established this pattern" and "the departure was intentional" are not defences — prior divergences were themselves deferrals, and reconciling them is the point.
+Use the approved design as the target for content, density, layout, states, and responsive behavior. Identify the actual reference before redesigning; if none exists, follow established product patterns and make ordinary reversible choices.
 
-The inversion: the design source is the *starting point*. Port it into typed components, then wire data, state, handlers, and queries into that shell. Existing feature files are replaced, not edited-toward-alignment. Stylesheets are regenerated from the design source, not patched — accumulated legacy rules get deleted, and the design's class taxonomy becomes the universe.
+- Enumerate the visible journey, including loading, empty, error, success, keyboard flow, and responsive variants. A missing backend capability is a contract gap to resolve, not permission to invent unrelated content.
+- Reuse design tokens, typography, icons, and components. Verify consumed custom properties are defined and check all supported themes. Do not add speculative theme support.
+- Preserve existing business behavior, state, accessibility, and selectors while changing markup. Replacing a design shell is not a reason to rewrite the domain logic.
+- Compare changed surfaces with the reference at relevant viewports and states. Capture or describe meaningful deltas and limitations. Proportion the evidence to the change rather than requiring a DOM audit for a one-line fix.
+- Keep styling in the repository's established system. Prefer shared tokens over repeated literals; use supported component variants and styling APIs. Runtime positioning or computed dimensions may legitimately need runtime styles.
+- Diagnose cascade order, layers, specificity, and supported overrides before replacing a library component. Later insertion alone does not override every more-specific rule. Replacing an accessible primitive requires preserving its keyboard, focus, and state behavior.
 
-Concretely:
-- Only design-source class names; port a missing one rather than inventing.
-- **Design tokens, never raw colour values.** Fonts from the design system.
-- **A token referenced but never defined renders as its fallback, silently and forever.** Grep every custom property you consume for its definition; a missing one usually surfaces as one theme looking right and the other unreadable.
-- Specified iconography only — no emoji, no hand-drawn SVG.
-- Translate the design source's own inline styles into stylesheet rules.
-- Match column counts, casing, density, button placement, and modal structure exactly.
-- Light and dark polished equally, and verified separately.
-- It's reference, not source — translate it, don't cargo-cult it into production paths.
+Functional and visual passes can be separate for a large redesign, but both remain in the acceptance criteria. Do not require two agents or two PRs for every UI change. A functional slice includes visible focus and accessible interaction; those are not deferred polish.
 
-### No inline CSS
+## Server state and local state
 
-**No inline style objects.** All styling — layout, colour, spacing, typography, shadow, radius — comes from stylesheets referencing design-system tokens, wired via the class attribute. Inline colour literals are equally banned.
+One owner fetches/cache-manages a server resource per domain. Reuse the project's server-state library when present; do not introduce one for a single request without need. Avoid parallel hand-written loading/error/abort implementations for the same data.
 
-**A component library's style props are inline CSS.** Size, weight, colour, background and spacing shorthands passed as props compile to inline styles and carry every one of the problems below. A prop taking a design-system token name is not an exemption — it still writes the rule into the element. A "bridge" pattern that sets a token through an inline style while the class-based version is pending is also a violation, not a migration step.
+Use cache keys that encode customer scope and all inputs affecting the response. Centralize key construction and align invalidation with every subscriber (`MIGRATE-KEY` in `workflow.md`). Clear or partition user-specific caches on identity changes.
 
-The only exception is **assigning a CSS custom property whose value is a runtime variable** — that is a token assignment the stylesheet then consumes, not a style rule. A custom property set to a literal is just an inline style with extra steps.
+Imperative transport is legitimate for bootstrap, streams, one-time downloads, presigned uploads, and worker contexts. Keep authentication, cancellation, retries, and errors consistent with the application; a one-use expiring URL need not become long-lived cached server state.
 
-Inline styles bypass the token system (colour drift between components), defeat the `:focus-visible` / `prefers-reduced-motion` / dark-mode media queries that live in stylesheets, and force component-file edits for what should be CSS edits.
-
-If you reach for an inline style while writing a component, stop: add a class referencing existing tokens, or add the token first and then use it via the class. Inline styles that pre-date your PR but sit on lines this diff touches get replaced under debloat-on-touch.
-
-**Source order beats specificity.** A component library that injects its styles at runtime injects them *after* the project's stylesheet, so its rules win no matter how the class is written. A plain class on such a component loses silently — the build passes, the test passes, and the colour is wrong in the browser. Escalating specificity to fight it is a losing pattern; the fix is to drop the library's component for plain markup carrying the project's class.
-
-That conversion has a cost to pay in the same PR: native elements ship none of the states the library was providing. Hand-write `:hover`, `:focus-visible`, `:disabled` and a `prefers-reduced-motion` path, or the conversion is an accessibility regression traded for a colour fix — see `accessibility.md`. Converting to native markup does preserve role, accessible name and native disabled semantics, so role- and state-based queries keep working.
-
-## Design completeness
-
-Before coding, **enumerate every element**: every page section, tile, button, interaction, state (loading / empty / error / populated), and responsive variant — citing the design source per item.
-
-Then resolve gaps *before* coding:
-- Design element needs data the backend doesn't expose → extend the backend in the same PR (preferred), or surface the choice to the owner.
-- Design element references a component that doesn't exist → build it in the same PR.
-
-**Substitutions are not permitted** ("that tile's data doesn't exist yet, render a different one"). Surface the gap first. Ship every checklist item; verify the checklist against the implementation before pushing. Deferrals need explicit approval recorded in the PR body.
-
-## Fidelity is a hard gate
-
-The PR body must carry:
-1. Side-by-side comparison evidence — design vs implementation, light and dark, every changed surface, deltas annotated.
-2. Token audit — every changed CSS rule cites its design-source line, or is a documented additive deviation with rationale.
-3. DOM-shape audit — a mapping from design-source structure to implementation structure for the reviewer to line-walk.
-4. Interaction parity — hover, active, focused, disabled states match, described explicitly or captured.
-
-**No comparison evidence → reviewer requests changes on the body alone, before reading code.** "Tests pass" and "looks fine in browser" are not fidelity proof. No author-judged "close enough": a different font weight, spacing unit, colour shade, divider thickness, or text casing is drift, and drift gets fixed. If you can't capture the evidence, stop and hand back — don't raise the PR.
-
-## Functional / design split
-
-Every UI-changing feature ships **two PRs by two agents**, because bundling mixes correctness signals with subjective ones, lets design thrash block working features, and demands one agent be expert in both data/state concerns and typography and motion.
-
-**Pass 1 — functional** (ships first): data wiring, state, mutations (optimistic updates, invalidations, rollback), loading/empty/error/retry states, accessibility, behaviour tests. Uses the design system as-is, styled minimally with the simplest token-hitting class. Explicitly excludes typography choices, palette decisions, density tuning, custom component shapes, hover/focus styling, visual snapshots.
-
-**Pass 2 — design** (after Pass 1 merges): typography, tokens, spacing and density, component shapes, hover/focus styling, motion. Stylesheet and class-attribute changes only. Explicitly excludes behaviour changes, type-signature changes, new API calls, and behaviour-test edits. Net-new primitives the design implies get their own issue.
-
-Bundle only when the surface is trivial (1–2 files), the design is silent on it, and no new primitive is implied. If Pass 2 finds Pass 1's structure can't carry the design, Pass 2 **stops and reports** — either restructure Pass 1 or adapt the design. The issue stays open until Pass 2 merges too.
-
-## Server state vs client state
-
-*If the project has no server-state cache library, the rule becomes: one module owns fetching per domain, components never fetch, and the invalidation rules below become explicit refresh calls at the same seams.*
-
-**All server state goes through `<query-lib>`.** Server state = anything fetched from the backend that the UI shows or another component might read. The test: would two callers benefit from a shared cache?
-
-Genuine raw-fetch exceptions:
-1. Auth bootstrap before the app mounts (no provider yet).
-2. The streaming connection itself — hydrate the entity through `<query-lib>`, invalidate on stream events.
-3. Uploads to presigned URLs.
-4. File downloads / document opens.
-5. Telemetry pings.
-6. Logout.
-7. Anything outside a component context (service worker, web worker, CLI).
-
-For (1) and (3), wrap the imperative *trigger* in a mutation so retry and error-toast behaviour matches the app, while the underlying call stays raw.
-
-Anti-patterns:
-- A cached query on a one-shot non-cacheable URL "because it's the convention" — bloats the cache, can keep expired URLs alive.
-- Raw fetch in a component for server state because "it feels simple." Two months later there are five hand-rolled variants.
-- Hand-rolling local loading/error/abort state around a fetch — that's a badly-shaped query hook.
-- Bypassing `<query-lib>` in a service module for "reusability outside hooks" — the reuse pattern is a shared hook with a parameter.
-
-**Migrate existing raw fetch on touch, never in bulk.** When you're in a file for another reason and it has non-exempt raw fetch, migrate it in that commit. If that blows the PR budget, file a follow-up and note it. Never a dedicated "migrate everything" sweep — blast radius without proportional benefit.
-
-**Client state lives in `<store>`, server state does not.** UI flags, form drafts, modal visibility, theme, collapsed panels, selected filters → store, consumed via narrow selectors, mutated via named actions (not raw setters). Persist only what should survive reload. Server data in the store is an anti-pattern; UI flags in the query cache are too. Flag shared local state, prop-drilling more than two levels, and context that should be a store.
-
-Hook shape: explicit query key, error handling, refetch semantics. Mutations declare success handlers that invalidate the relevant keys so consumers refetch automatically. **Query keys come from one shared key factory per domain, never a literal typed at both the subscription and the invalidation** — see `MIGRATE-KEY` in `workflow.md`.
+Keep form drafts and component-local UI state local until sharing/persistence is required. Use the existing store for state that needs it, with narrow subscriptions. Do not copy server records into a global store merely to display them or move every local flag into global state.
 
 ## State contracts
 
-**STATE-CONTRACT — undefined, empty, and loading are three different states.** Every data surface resolves four states explicitly and separately: initial load, loaded-and-empty, loaded-with-data, error. Absence of data is not a loading check — a careless truthiness guard renders the spinner forever on an empty result, or renders "no results" while the first request is still in flight. Branch on the query's own flags, and render the empty state only once the request has settled with zero rows.
+**STATE-CONTRACT — pending, absent, empty, error, and data are distinct.** Render initial loading, loaded-empty, loaded-data, and failure from explicit state. A truthiness test must not turn an empty result into an endless spinner. Expose an actual retry action when recovery is possible.
 
-**STATE-REFETCH — a refetch never blanks the screen.** Distinguish first load from background refetch. First load gets the skeleton; a refetch, a filter change, or a poll keeps the current rows mounted with a subdued in-flight affordance. Swapping mounted content for a spinner on every refetch is layout thrash, not a loading state. Paginated and filtered lists keep the previous page's rows during the next fetch. A mutation's invalidation must not unmount the surface the user is looking at.
+**STATE-REFETCH — background work preserves useful context safely.** Keep current data during refetch when it still describes the same authorized view, with a pending affordance. After a scope/identity change, clear foreign data immediately. For changed filters/pages, show previous data only when it is clearly labeled and actions cannot target the wrong rows.
 
-**STATE-NODELAY — never add a delay with no work behind it.** No timer before a synchronous computation, no artificial minimum spinner duration, no "let it feel like it loaded." If the work is synchronous, render it synchronously. A loading state represents real pending work; a timer that represents nothing is a bug that also masks real latency once the work becomes async.
+**STATE-NODELAY — pending UI represents actual work.** Do not add arbitrary delays to synchronous work. A deliberate animation or interaction debounce has its own product purpose and must not conceal completion or create a fake network state.
 
-## Errors
+**STATE-DRAFT — retained draft state and submitted state have different contracts.** Conditional forms may preserve hidden drafts for navigation, but serialize only the active, permitted branch. Never submit stale hidden notes or fields simply because they remain in a component state object. Test switch-away, switch-back, reset, and the actual saved payload; the backend also validates allowed fields.
 
-**Errors are toasts, never inline.** One global toast layer at the app root, backed by a queue store. Every failure path — validation, network, 4xx/5xx, optimistic-update revert — surfaces as a toast.
+**STATE-ASYNC — late responses cannot overwrite newer intent.** Cancel obsolete work or compare request/input versions before applying a response. A user changing selection, identity, document, or route invalidates earlier results. Prevent duplicate submits where relevant and preserve editable state on failure.
 
-Blocking validation disables the submit control (clear labels, no red-ring-plus-helper-text); if the user submits anyway, toast. Inline is correct only for loading states, empty states, and disabled-reason tooltips. Full-page error boundaries are for genuinely unrecoverable state only — otherwise toast plus retry.
+For AI-assisted edits, separate suggested/previewed values from committed values. When the product requires deliberate acceptance, saving is unavailable until acceptance/rejection resolves the preview. Label the state accessibly and test stale suggestions, reset, accept, reject, and save; parser validity alone does not authorize a consequential decision.
 
-Delete on sight: field-error spans under inputs, inline alert banners.
+## Errors and validation
 
-**A failure path with no toast is the more common defect than a toast that should have been inline.** Walk every branch that can reject — including the ones inside a loop — and confirm each surfaces.
+Choose presentation by where the user can act. Field errors belong with associated inputs and accessible descriptions; global/transient outcomes can use the existing toast layer; persistent surface failures need a stable message and retry path. Avoid duplicate announcements for one failure.
+
+Never silently swallow a rejection or display success before the outcome is known. Keep entered data on a failed submission. Do not rely on a disabled button or a disappearing toast to explain every validation error. The backend enforces the invariant regardless of UI state.
 
 ## Bulk and optimistic mutations
 
-**BULK-ATOMIC — a bulk action is one request, or it reports per-item outcomes.** Prefer one endpoint taking N ids and returning a per-item result. A loop of sequential awaits from the client is N independent mutations wearing one button: item 3 failing after 1 and 2 committed leaves the server in a state no client-side rollback can undo.
+**BULK-ATOMIC — the server contract states atomic or per-item outcomes.** Prefer an existing bulk endpoint when it can enforce the intended semantics. A client loop is multiple independent mutations; it cannot roll back committed server effects by restoring a local snapshot.
 
-**BULK-PARTIAL — a partial failure never presents as a total failure.** If the client must fan out, settle all of them — never a short-circuiting loop — then report succeeded and failed counts and name the failures. One "Something went wrong" toast over two successes and one failure is a lie the user then acts on.
+**BULK-PARTIAL — report partial success accurately.** With independent fan-out, settle and collect results, bound concurrency, then report successes and failures. A short-circuiting loop can leave an unknown tail; one total-failure toast misrepresents committed successes.
 
-**BULK-ROLLBACK — roll back only what did not commit.** An optimistic rollback that restores the whole pre-mutation snapshot after a mid-sequence failure reverts the successful items in the UI while they remain committed on the server; the UI is now wrong until a refetch. Choose one and state which in the PR body: atomic server-side, per-item rollback, or no optimistic update for bulk paths with invalidation on settle.
+**BULK-ROLLBACK — undo only uncommitted optimistic state.** Use an atomic server operation, per-item rollback plus invalidation, or avoid optimistic bulk updates. Reconcile from the server after uncertain outcomes. Test a later item failing after an earlier one committed.
 
-**BULK-IDEMPOTENT — a retried bulk action does not double-apply.** Retry is the user's first instinct after a partial-failure toast. Key the operation so re-submitting the same set is safe.
+**BULK-IDEMPOTENT — repeating the action cannot repeat the business effect.** Reuse the logical operation identity across retries where required (`IO-IDEMPOTENT` in `integrations.md`). Do not key deduplication permanently on a set of IDs if performing a later distinct operation on the same records must remain possible.

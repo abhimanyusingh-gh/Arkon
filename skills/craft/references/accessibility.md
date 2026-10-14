@@ -1,12 +1,12 @@
 # Accessibility
 
-A11y findings are correctness findings, not polish. They are in scope for the **functional** pass and never deferred to the design pass — a keyboard-unreachable control is a broken feature, not an unstyled one.
+A11y findings are correctness findings, not polish. Include them with the working feature: a keyboard-unreachable control is broken behavior. Prefer native elements and established accessible primitives over custom interaction implementations.
 
-## A11Y-DISABLED — never remove an element from the accessible tree to convey state
+## A11Y-DISABLED — choose disabled semantics deliberately
 
-A native `disabled` attribute strips the element from the accessible tree: screen readers skip it, it loses focus, and the *reason* it is unavailable goes unannounced. A "Coming soon" label on a natively-disabled item is never read aloud.
+Native `disabled` usually removes a control from sequential keyboard focus and suppresses activation; it does not generally remove the control from the accessibility tree. Use it when native unavailability is the intended interaction, and expose the reason in accessible text.
 
-For anything the user must still perceive — an unavailable option, a locked row, a not-yet-permitted action, a placeholder item — use `aria-disabled`, keep it focusable, and suppress activation in the handler. Reserve native `disabled` for a submit control whose form is invalid, where adjacent copy carries the reason.
+Use `aria-disabled` when an unavailable action must remain discoverable in the widget's focus model. It does not suppress activation: guard pointer and keyboard handlers and prevent side effects. Test both activation paths. Neither form of disabled state is an authorization boundary.
 
 ## A11Y-MODEL — one interaction model per widget
 
@@ -27,18 +27,18 @@ A live-region message written before the mutation resolves announces an outcome 
 
 ## A11Y-FOCUS — visible focus and reduced motion are required, not optional
 
-Every interactive element has a `:focus-visible` style with a real contrast delta **in both themes**; never remove the outline without a replacement. Every transition, animation, autoplay, and parallax is wrapped in a `prefers-reduced-motion: reduce` query with a genuine no-motion path.
+Every interactive element has a visible focus indicator with adequate contrast in supported themes; never remove the outline without a replacement. Respect `prefers-reduced-motion` for nonessential motion and provide a reduced/no-motion path as appropriate. Keyboard and screen-reader behavior must remain usable when motion is disabled.
 
-Both live in the stylesheet — one more reason inline styles are banned.
+Use the project's styling system to express focus, state, contrast, and motion preferences consistently.
 
 ## A11Y-FLOOR — the baseline on every UI PR
 
 - Labels bound to controls. Never placeholder-as-label.
 - Icon-only controls carry an accessible name.
 - Images carry alt text; empty alt for decorative.
-- One top-level heading per page, no skipped levels.
-- Every dialog is keyboard-reachable, Escape-closable, focus-trapped while open, and returns focus to its trigger on close.
-- Hit targets at least 24px.
+- A meaningful heading hierarchy, following the page's actual structure.
+- Dialogs are keyboard-reachable and named. Modal dialogs contain focus, support dismissal where appropriate, and restore focus deliberately; nonmodal dialogs follow their different focus model.
+- Meet applicable target-size/spacing requirements; for web controls use at least the WCAG minimum or an allowed equivalent/exception.
 - Colour is never the sole carrier of meaning — pair it with text, shape, or an icon.
 - Contrast verified in light and dark, not assumed from the token name.
 - Dynamic content that replaces a focused element moves focus deliberately; never drop focus to the document body.

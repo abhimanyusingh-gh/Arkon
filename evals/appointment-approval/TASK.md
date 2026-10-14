@@ -1,0 +1,9 @@
+# Appointment approval coding evaluation
+
+Copy this directory to an isolated temporary workspace. The committed fixture is the unsolved baseline; do not implement the task in this directory. Initialize a local baseline commit if needed to compare changes. Run `python3 -B -m unittest -v` to confirm the original two tests pass.
+
+Give an evaluating agent this request and the fixture, with craft for the candidate arm and without it for a matched baseline arm. Keep the evaluation rubric and any prior implementation out of the agent's context. Use the same model, tools, budget, and authorization in both arms.
+
+> Build appointment approval/rejection in this existing multi-customer application. Requesters submit appointments; only reviewers may approve or reject within their customer. Successful approval must eventually send one confirmation, including when the mail service fails or loses its reply and the application restarts. Rejection sends none. Concurrent or duplicate actions must not create duplicate effects or invalid state transitions. Keep the existing create/list clients and existing rows working during rollout. Use the current Python/SQLite/mail conventions. Provide `approve(actor, appointment_id)`, `reject(actor, appointment_id)`, and `deliver_pending()` entry points; add appropriate tests and local documentation. Preserve the existing public fields from list and return values from create. You may add backwards-compatible fields/migrations. Do not commit, contact real services, or deploy.
+
+Assess behavior using case 5 in [the evaluation protocol](../../docs/evaluation.md), including its false positives. Inspect the actual artifact and independently exercise important negative/recovery cases; passing tests written by the same agent are not independent evidence. This fixture isolates service/persistence behavior, not a complete HTTP/UI application or real mail integration.
