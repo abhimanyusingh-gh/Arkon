@@ -45,6 +45,25 @@ Provider-neutral: the rules hold for any hosted model behind any client library.
 - Test representative task outcomes as well as parsing: correct domain decisions, invalid/foreign ids, missing fields, refusal, truncated and allowed wrapped output. Use a small versioned evaluation set for consequential prompt/model changes; parser acceptance alone is not evidence of task quality. Live-provider evaluation depends on available credentials, cost and the task's authorization.
 - The call type names the call in metrics and logs (`LLM-USAGE`).
 
+**LLM-COST — every model call has a budget and an owner.**
+
+- Set a per-unit-of-work token budget and a per-run cost ceiling; exceeding either stops or degrades the run.
+- Attribute cost to its unit of work via the `LLM-USAGE` and `LLM-CORRELATE` fields.
+- Batch calls where the provider supports it.
+- Use prefix/prompt caching where supported; keep the stable prefix first and variable content after it.
+- Run cheap deterministic pre-checks before a call; skip the call when they decide the outcome.
+- Count retries against the budget (`LLM-RETRY`).
+
+**LLM-EVAL — a prompt or model change ships with an evaluation.**
+
+- Keep a versioned golden set whose labels are made independently of the model under test.
+- Use deterministic graders where the output allows: schema, exact field, set membership.
+- Hold out a slice that is not used while tuning the prompt.
+- Re-run the evaluation on every model, prompt or output-contract change (`LLM-PROMPT`).
+- Never let the model grade its own output as the only signal.
+- Report pass rate together with cost and latency per case.
+- Review the change against its stated contract (`REVIEW-SPEC` in `review.md`).
+
 ## Reviewer checklist
 
 1. Does trace context reach each call, with provider request ids captured where supported?
@@ -55,5 +74,7 @@ Provider-neutral: the rules hold for any hosted model behind any client library.
 6. Does new automation have its required kill switch and spend controls?
 7. Is the prompt versioned, built from an explicit minimized field list?
 8. Do prompt/model changes validate task quality as well as parsing?
+9. Does each model call have a per-unit budget, a run cost ceiling, and attribution to its unit of work?
+10. Is there evaluation evidence (versioned golden set, held-out slice, pass rate with cost and latency) for prompt or model changes?
 
 Common misses: missing trace context on synchronous or async paths; SDK retries omitted from the bound; invented reasoning-token counts; replaying an ambiguous tool effect; trusting a returned id; logging the model response "to debug".
