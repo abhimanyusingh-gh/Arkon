@@ -34,13 +34,31 @@ For important calculators, projectors and derived displays, test the domain inva
 
 - **Backend:** cover boundaries, rounding, units, null/zero distinctions and relevant modes. Use hand-calculated contract examples, independently derived/reference results, or properties such as conservation/monotonicity where valid. Copying the production formula into the test can reproduce the same bug twice.
 - **Frontend:** check that displayed inputs and derived results refer to the same selected source and remain consistent across meaningful fixtures. Do not use the rendered total as the oracle for the rest of the screen.
-- **E2E:** choose representative user scenarios and high-risk interactions. Use generated/property-based cases at a cheaper layer for broad combinations; do not require the full Cartesian product in a browser.
+- **E2E:** choose representative user scenarios and high-risk interactions. For broad generated/property-based combinations at a cheaper layer, see `PBT-PROPERTY` below; do not require the full Cartesian product in a browser.
 
 The failure this prevents: every layer has complete-*looking* tests for its own scope, while no assertion says "for any rendered row, the body value equals the footer value equals the computed difference." That's how an internally-inconsistent display ships — a label reading 0% next to a non-zero amount.
 
 **Exhaustiveness is part of an exhaustive claim.** A check of 4 of 15 dependent tables cannot prove the whole datastore invariant. Derive the relevant population from metadata where reliable, and account for deliberate exclusions; metadata traversal alone does not establish semantic relationships.
 
 Preserve the important invariant through refactors, even when its test moves to a different layer.
+
+## PBT-PROPERTY — test properties and boundaries with generated inputs
+
+Property-based testing uses randomly generated input to find counterexamples to an invariant. Use it for parsers and serializers, calculators and derived values, validators, state machines and transition tables, deduplication, sort and merge, idempotent operations, and round-trip conversions (encode/decode).
+
+**When to use:** build generators from the domain with boundary values, null, zero, unicode and large sizes; avoid filter-heavy generators. Test properties including: round trip (encode/decode returns original), idempotence (apply twice = apply once), invariant preserved (preconditions imply postconditions), oracle/model comparison, metamorphic relations, and "total function never throws".
+
+**Warning:** do not restate the production formula as the oracle (replicates the same bug twice, like `CLAIM-EVIDENCE` in verification.md for invariants). Use hand-calculated examples or a reference implementation.
+
+**PBT-REPRO — pin discovered counterexamples and bound example budgets.**
+
+- Log the seed on failure and persist failing examples in version control.
+- Each discovered counterexample becomes an explicit pinned example test.
+- Set a per-test example budget (e.g., 1000 cases) so CI time is bounded.
+- Decide whether CI runs deterministic (fixed seed) or randomized explicitly, and state the tradeoff.
+- Report the generator, example count and seed in the gate line.
+
+**Tool examples:** Hypothesis (Python), fast-check (JavaScript), jqwik (Java), proptest (Rust).
 
 ## TEST-CONCURRENCY — prove the datastore guarantee being claimed
 
@@ -129,6 +147,7 @@ For a meaningful behavior, safety or recurring defect, add a regression that rep
 - Assert the externally meaningful wrong value or transition with an independent expected result.
 - For a reversible typo or low-impact visual correction, inspection/smoke can be sufficient; do not add a brittle literal test solely to satisfy a rule.
 - A validator shipped without a case exercising the format it validates is the same gap one step earlier.
+- A shrunk counterexample from property-based testing becomes a pinned example test (`PBT-REPRO`).
 
 Manual smoke and automated regression answer different questions. Preserve useful automated protection for repeatable failures; continue visual, composition and exploratory checks where automation does not establish the product behavior.
 
