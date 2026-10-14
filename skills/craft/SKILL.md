@@ -81,6 +81,10 @@ Read on the trigger, before starting — not after review flags it.
 | Production code — types, config, naming, complexity, dead code, layering, indices | `references/authoring.md` |
 | Any UI work | `references/frontend.md` |
 | Any interactive component, form, dialog, or announcement | `references/accessibility.md` |
+| Scheduled job, poller, queue worker, claim, lease, manual job trigger | `references/async-jobs.md` |
+| Any log statement, exception handling, or error body from an exception | `references/observability.md` |
+| Call to a model provider: Gemini, OpenAI, Claude, LLM integration | `references/llm-calls.md` |
+| Dependency bump, BOM/runtime upgrade, CVE remediation, scanner suppression | `references/dependencies.md` |
 | Any test, unit through e2e | `references/testing.md` |
 | Before any push, and whenever an agent reports work complete | `references/verification.md` |
 | Reviewing a diff | `references/defect-classes.md`, then `references/review.md` |

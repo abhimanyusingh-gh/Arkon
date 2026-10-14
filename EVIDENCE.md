@@ -170,6 +170,48 @@ State these alongside any number from this file, or the numbers mislead.
 
 6. **Repo C's numbers are self-reported, not reconstructed.** The counts in its table (538/538, 648, 18 failures) were recorded during the sessions rather than recovered from an API afterwards, so unlike every number above them they are not independently reproducible from the commands at the end of this file.
 
+## Twenty rules from three repos, 9-week period
+
+Recent evidence from `document-criteria-matcher` (ME-97 prefill scheduler and prior work), `clinic-gateway` (dependency management), and `software-craftsmanship` (skill updates). Corpus: 122 commit lines (105 unique subjects), 4 PRs with teammate raises (DCM #22: 6 raises; #43: 9; CG #413: 4; #414: 1), 37 rework commits.
+
+**Data corrections:** Not 7 months, 9 weeks (Aug 12 - Oct 14). Not 125 commits after removing git stash refs. Commit counts measure slicing, not frequency. Same-branch rework is self-detected, not a review finding. One author.
+
+| Rank | Rule ID | Rule | Instances | Repos | Severity | Reference |
+|---|---|---|---|---|---|---|
+| 1 | LOG-NO-CONTENT | Logs carry IDs, never exception messages or free text | 7 | DCM + CG | blocker | `observability.md` |
+| 2 | COMMIT-TRUTH | Commit subject describes diff; no same subject over different diffs | 6 | CG + DCM | should-fix | `workflow.md` |
+| 3 | JOB-LEASE | Exclusive job execution via database lease | 5 | DCM | blocker | `async-jobs.md` |
+| 4 | MIGRATE-ROLLING / MIGRATE-IMMUTABLE | Safe schema migrations for rolling deploys | 5 | DCM | blocker | `workflow.md` |
+| 5 | REPRO-FIRST | No error handling change without root-cause reproduction | 4 | DCM + CG | should-fix | `review.md` |
+| 6 | LOG-SENTINEL | Every catch site that logs has a PHI sentinel test | 11 test classes | DCM | should-fix | `observability.md` + `testing.md` |
+| 7 | DEP-PIN / DEP-SUPPRESS | Dependency overrides carry advisory ID, reason, removal condition | 4 | CG | should-fix | `dependencies.md` |
+| 8 | DEP-BOOT | Real app boots after upgrade; diff transitive tree | 3 | CG | blocker | `dependencies.md` |
+| 9 | LOCK-MINIMAL | No lock when row may not exist (MySQL gap-lock deadlock) | 3 | DCM | should-fix | `authoring.md` Database |
+| 10 | CONFIG-FAIL-CLOSED | Secrets get no production default; invalid config fails at startup | 4 | DCM | should-fix | `authoring.md` + **contradicts current CONFIG-DAY-ONE** |
+| 11 | TEST-PIN | Characterization tests must fail when behaviour changes | 3 | DCM | should-fix | `testing.md` |
+| 12 | TEST-CONCURRENCY | Every exclusivity claim tested against real database | 5 test classes | DCM | should-fix | `testing.md` + `async-jobs.md` |
+| 13 | JOB-CLAIM / JOB-FENCE | Claim with token; finalize filters on id + token | 4 mechanisms | DCM | blocker | `async-jobs.md` |
+| 14 | JOB-RETIRE | Mark obsolete, not deleted; retire after complete crawl only | 3 | DCM | should-fix | `async-jobs.md` |
+| 15 | JOB-GATE + TEST-GATE | Gates checked cheapest first; one test per gate | 7 tests | DCM | should-fix | `async-jobs.md` + `testing.md` |
+| 16 | NAME-FULL | Collaborators named after type, no abbreviations | 3 | DCM | nit / should-fix | `authoring.md` NAME-* |
+| 17 | LLM-OUTPUT-UNTRUSTED | Model output checked against request; no echoing | 3 | DCM | should-fix | `llm-calls.md` |
+| 18 | LLM-CORRELATE / LOG-ID-NO-SECRET | Correlation ID = business key + stage + attempt | 3 | DCM | should-fix | `llm-calls.md` + `observability.md` |
+| 19 | LOG-UNTRUSTED-TEXT / LLM-PROMPT-MINIMAL | Log length only of model-supplied text | 2 | DCM | should-fix | `observability.md` / `llm-calls.md` |
+| 20 | BRAND-SCOPE | Brand only where mix-up is possible; avoid ceremony | 2 | DCM | nit | `authoring.md` Type safety |
+
+**Data that disproved existing rules:**
+
+| Earlier claim | What the data shows | Action |
+|---|---|---|
+| CONFIG-DAY-ONE: "every config service carries a hardcoded default" | Commit 79e5a62 removes all prod defaults; missing value means startup fails with ERROR | Split into CONFIG-FAIL-CLOSED; contradicts current text |
+| Branded types mandatory | Over-applied through CLAUDE.md rule; reverted in review (b85d2fd) | Refine BRAND-SCOPE in `authoring.md` |
+| TOUCH-BLAST | Broken repeatedly by its own author | Document gap; separate issue from craft rules |
+
+**Known issues in the code (separate PRs):**
+- `ReferralController.java:45/:83/:85` return raw exception messages in HTTP error bodies
+- `CoachTaskManagerClientImpl.java:79` puts message into wrapping exception
+- `StructuredLogger` still has `warn`/`error(…, Throwable)` overloads
+
 ## Reproducing this
 
 Every number above comes from read-only GitHub API calls against the two repositories:
