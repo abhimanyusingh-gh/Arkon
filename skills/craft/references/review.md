@@ -18,6 +18,20 @@ For each finding, name the trigger and concrete failure, point to the smallest r
 
 Severity follows impact: unsafe cross-customer access, lost required capability, unguarded irreversible effects, or a breaking deployed contract are blockers. Other demonstrated correctness failures should be fixed before readiness. Style and heuristic thresholds remain advisory unless repository policy makes them requirements.
 
+**REVIEW-SPEC — review against the stated contract, not the author's summary.**
+
+- Reconstruct the requirement list independently from the issue, spec or user request before reading the diff or its description.
+- Check both directions: requirements with no implementing path (gaps), and behavior nobody asked for (scope creep).
+- Raise an ambiguity or contradiction to the author with the assumption you reviewed against; do not resolve it silently.
+- Verify each acceptance row on the evidence card against its implementing path and test, one path per row.
+- Trace each requirement in this form:
+
+```text
+SPEC TRACE  Refund capped at order total -> refund.go:capRefund -> RefundCapTest.overTotal passes
+SPEC TRACE  Email receipt on refund -> none -> GAP
+SPEC TRACE  CSV export of refunds -> export.go:exportRefunds -> observed: not in spec | EXTRA
+```
+
 ## Review communication
 
 Lead with the most important actionable result. Use concise prose or a numbered list when findings are easier to scan that way; follow the platform's required schema if one exists. Group duplicate causes rather than creating a finding for every occurrence.
@@ -49,3 +63,4 @@ Like verification, code review rationalizations often skip the actual check. Use
 | The agent's summary says complete | Agent reports state what was attempted; they are data, not independent verification | `REVIEW-DISCLOSED` |
 | A grep hit is a finding | Grep is a search lead; inspect the context, reason, and reachability before reporting | |
 | I'd write it differently | Preference is a nit at most; enforce repository policy where it exists | |
+| I'll review the diff summary; the author knows what was asked | The summary is the author's claim; reconstruct the spec, then review against it | `REVIEW-SPEC` |
