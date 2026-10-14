@@ -40,3 +40,33 @@ Apply to the boundary being changed. These are engineering safeguards, not a cla
 - Prove it with a negative test: a fixture containing planted instructions must produce no unauthorized tool call, no outbound request and no cross-scope read, observed at the real boundary rather than a mock.
 
 Before declaring the boundary safe, demonstrate the important negative case through the real entry point: denied actor, foreign object, unsafe input, or missing secret. A test that merely asserts a mock permission method was called does not establish enforcement.
+
+## SECURITY-MAP — OWASP coverage
+
+The map shows which craft rules address each category; "not covered" means the skill gives no specific guidance and the category needs its own review.
+
+| Category | Craft rules |
+|---|---|
+| A01 Broken Access Control | `AUTH-BOUNDARY`, `SCOPE-QUERY` |
+| A02 Cryptographic Failures | `SECRET-BOUNDARY` (key handling only) |
+| A03 Injection | `INPUT-BOUNDARY`, `INJECTION-BOUNDARY` |
+| A04 Insecure Design | `APP-BOUNDARIES` (ownership and invariants; threat modeling not covered) |
+| A05 Security Misconfiguration | `CONFIG-FAIL-CLOSED`, `SECRET-BOUNDARY` |
+| A06 Vulnerable and Outdated Components | `DEP-PIN-SUPPRESS` (CVE workaround pins and suppressions; scanning not covered) |
+| A07 Identification and Authentication Failures | `AUTH-BOUNDARY` |
+| A08 Software and Data Integrity Failures | not covered |
+| A09 Security Logging and Monitoring Failures | `LOG-FAILURE` (failure diagnostics only; security event logging and alerting not covered) |
+| A10 Server-Side Request Forgery | `INPUT-BOUNDARY` |
+
+| Category | Craft rules |
+|---|---|
+| LLM01 Prompt Injection | `INJECTION-BOUNDARY`, `TRIFECTA-BOUNDARY` |
+| LLM02 Sensitive Information Disclosure | `SECRET-BOUNDARY`, `LLM-PROMPT`, `TRIFECTA-BOUNDARY` |
+| LLM03 Supply Chain | `DEP-PIN-SUPPRESS` (package pins; model and data provenance not covered) |
+| LLM04 Data and Model Poisoning | not covered |
+| LLM05 Improper Output Handling | `LLM-FAILSAFE`, `INJECTION-BOUNDARY` |
+| LLM06 Excessive Agency | `LLM-FAILSAFE`, `INJECTION-BOUNDARY`, `TRIFECTA-BOUNDARY` |
+| LLM07 System Prompt Leakage | `SECRET-BOUNDARY` (secrets kept out of model requests; prompt extraction not covered) |
+| LLM08 Vector and Embedding Weaknesses | not covered |
+| LLM09 Misinformation | `LLM-PROMPT` (task-outcome evaluation only; grounding not covered) |
+| LLM10 Unbounded Consumption | `IO-BUDGET`, `LLM-RETRY` |
