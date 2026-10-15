@@ -244,6 +244,25 @@ These examples support specific checks, not the effectiveness of the complete sk
 
 The skill's own history suggests a maintenance control: `6b6b7de` added production-session rules, `69f64b8` added checkable verification and consolidated authorities, and the four-guide commit added async, observability, LLM and dependency guides while leaving several advertised reversals and cross-reference rules only in this evidence file. Evidence that changes a rule must update its executable guidance, trigger, and review path together. A provenance table alone does not change agent behavior.
 
+## Version 1.3.0 additions
+
+These additions are supplemental engineering judgment. None was derived from the review corpus or the authored-history inventory above, and none comes with a measured defect reduction. "External, unreproduced" means the item follows a published external source that this repository does not re-derive or test against.
+
+| Item | Added | Evidence label | Source | Limitation |
+|---|---|---|---|---|
+| 0 | `project-binding.md`, `BIND-DISCOVER`, `discover_project_context.py` | engineering judgment | the skill's "Project bindings" block; one read-only run against a private multi-module service | heuristic detection; modules deeper than one directory and custom frameworks are missed |
+| 2 | rationalization tables in `verification.md` and `review.md` | engineering judgment | existing rule text, restated as excuse and answer | no measurement that the tables change agent behavior |
+| 3a | `TRIFECTA-BOUNDARY`, `INJECTION-BOUNDARY` | engineering judgment | published prompt-injection threat models | no injection test suite ships with the skill |
+| 3b | `SECURITY-MAP` (OWASP Top 10 2021, OWASP Top 10 for LLM Applications 2025) | engineering judgment; external, unreproduced | OWASP category lists | a mapping, not coverage; categories without specific guidance are marked "not covered" |
+| 4 | `PBT-PROPERTY`, `PBT-REPRO` | engineering judgment; external, unreproduced | property-based testing practice | no property-based test fixture ships with the skill |
+| 5 | `agent-collaboration.md`: `AGENT-ASK`, `AGENT-DIFF`, `AGENT-INSTRUCTIONS` | engineering judgment | operating experience running coding agents; scope-gated against existing references (about 4% overlap) | operator experience, not counted incidents |
+| 6 | `check_rules.py` and `CATCH-EMPTY` | engineering judgment | `TEST-NODELETE` and `TEST-SKIP` text | line-based heuristics; string literals need the `check-rules: ignore` marker; a clean run is not a review |
+| 7 | `performance.md`: `PERF-MEASURE`, `PERF-QUERY`, `PERF-BUDGET`, `PERF-CACHE` | engineering judgment | performance bullets previously in `delivery.md` | no benchmark or budget fixture |
+| 8 | `LLM-COST`, `LLM-EVAL` | engineering judgment; external, unreproduced | model-evaluation practice | no provider-specific prices or evaluation set ship with the skill |
+| 9 | `REVIEW-SPEC` | engineering judgment | `APP-ACCEPTANCE` and the evidence card | not evaluated on held-out review cases |
+
+Also in 1.3.0: README examples and diagrams (documentation only), an update reminder hook, and validator enforcement of reference line caps and rule-ID resolution. A behavioral A/B evaluation of these additions (item 1) is deferred to 1.4.0; until it runs, treat 1.3.0 as structurally validated only.
+
 ## Reproducing this
 
 For the original PR corpora, these read-only API calls acquire source records. They do not reproduce the historical snapshot, the regex classification, session reports, or commit-history aggregates by themselves:
