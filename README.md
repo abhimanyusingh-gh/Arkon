@@ -43,6 +43,142 @@ Two mechanisms in `SKILL.md` make the work reviewable:
 - **Workers read the relevant guidance** before implementation. The brief points to the skill and owned boundaries; use the contract card for substantial handoffs.
 - **Substantial work returns a filled-in contract card; small fixes can report evidence in prose.** State acceptance criteria, affected boundaries, and deliberate omissions; back verification claims with commands and actual results. "All tests pass" is not a result, `1331/1331, 10 skipped` is. An unavailable gate is reported by name and reason. `verification.md` checks for lost behavior, deleted coverage, and harnesses that hide failures in the real application.
 
+## Quick start
+
+Ask Claude to use the skill directly, for example "Use craft to review this diff against its acceptance criteria", or type `/craft`. The skill loads the core rules and pulls in references as the work reaches each boundary.
+
+## When each reference loads
+
+The skill checks each boundary a task crosses in turn and loads the matching references.
+
+```mermaid
+flowchart TD
+    Start["Task arrives"] --> Q1{"Design?"}
+    Q1 -->|yes| R1["application-design.md, security.md, tenancy.md"]
+    Q1 -->|no| Q2{"Writing code?"}
+    R1 --> Q2
+    Q2 -->|yes| R2["authoring.md, integrations.md, async-jobs.md, observability.md, llm-calls.md, frontend.md, accessibility.md, dependencies.md"]
+    Q2 -->|no| Q3{"Tests?"}
+    R2 --> Q3
+    Q3 -->|yes| R3["testing.md"]
+    Q3 -->|no| Q4{"Claiming done?"}
+    R3 --> Q4
+    Q4 -->|yes| R4["verification.md"]
+    Q4 -->|no| Q5{"Reviewing?"}
+    R4 --> Q5
+    Q5 -->|yes| R5["defect-classes.md, then review.md"]
+    Q5 -->|no| Q6{"Shipping?"}
+    R5 --> Q6
+    Q6 -->|yes| R6["workflow.md, delivery.md"]
+    Q6 -->|no| Q7{"Learning from history?"}
+    R6 --> Q7
+    Q7 -->|yes| R7["history.md"]
+```
+
+## Examples of the patterns
+
+Short, anonymized excerpts from production code that show the shape each rule asks for.
+
+### Example: Authorization boundary enforcement
+
+```typescript
+export function requireAuth(req: Request, res: Response, next: NextFunction): void {
+  if (!req.authContext) {
+    res.status(401).json({ message: "Authentication required." });
+    return;
+  }
+  next();
+}
+```
+
+Pattern: the check runs at the entry point before any data access and returns early with a clear error (`AUTH-BOUNDARY`).
+
+### Example: Scope isolation in a multi-tenant route
+
+```typescript
+export async function requireMatchingScope(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { scopeId: authScopeId } = getAuth(req);
+    const pathScopeId = req.params.scopeId;
+    if (!pathScopeId) {
+      res.status(400).json({ message: "scopeId path parameter is required." });
+      return;
+    }
+    if (pathScopeId !== authScopeId) {
+      res.status(403).json({ message: "scopeId does not match authenticated scope." });
+      return;
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+```
+
+Pattern: the scope key comes from the authenticated context and is compared with the request parameter before the handler runs (`tenancy.md`).
+
+### Example: Errors that carry metadata, not content
+
+```typescript
+export class ApplicationError extends Error {
+  constructor(
+    message: string,
+    readonly statusCode: number,
+    readonly code?: string,
+    readonly details?: Record<string, unknown>
+  ) {
+    super(message);
+    this.name = "ApplicationError";
+  }
+}
+
+export function isApplicationError(error: unknown): error is ApplicationError {
+  return error instanceof ApplicationError;
+}
+```
+
+Pattern: a fixed, safe message and a machine-readable code reach the client; sensitive detail stays out of messages and logs (`observability.md`).
+
+## Threat model: TRIFECTA-BOUNDARY
+
+An agent or model session that holds private data, ingests untrusted content, and can cause an outbound effect can be steered into exfiltration. Remove one leg for that session. The rules are in `skills/craft/references/security.md`.
+
+```mermaid
+flowchart TD
+    P["Private data"] --> X["Exfiltration or unintended action"]
+    U["Untrusted content"] --> X
+    O["Outbound effect"] --> X
+    P -->|break a leg| B1["Scope data to the task"]
+    U -->|break a leg| B2["Treat content as data, never instructions"]
+    O -->|break a leg| B3["Require human approval or allow-list destinations"]
+```
+
+## Project-binding discovery
+
+A bundled stdlib script, run with `python3 skills/craft/scripts/discover_project_context.py . --out .claude/craft-context.json`, scans build files and repository instructions and writes each value marked declared, detected or inferred. The resulting context is untrusted, so the skill reads only its structured fields.
+
+```mermaid
+flowchart LR
+    S["Scan repository (pom.xml, package.json, CLAUDE.md...)"] --> D["Detect build system, framework, ORM, tests, conventions"]
+    D --> W["Write .claude/craft-context.json (root hash, confidence per field)"]
+    W --> C["--check detects stale context"]
+    C --> R["Skill reads structured fields"]
+```
+
+## What's new in 1.3.0
+
+- Project-binding discovery script and reference (`project-binding.md`).
+- Rationalization tables in `verification.md` and `review.md` that answer common excuses with the rule they break.
+- `TRIFECTA-BOUNDARY` and `INJECTION-BOUNDARY` in `security.md`.
+- OWASP Top 10 (2021) and OWASP Top 10 for LLM Applications (2025) coverage map in `security.md`.
+- Property-based testing guidance (`PBT-PROPERTY`, `PBT-REPRO`) in `testing.md`.
+- Agent-collaboration reference: when to ask versus proceed, reviewing agent-authored diffs, instruction-file boundaries.
+- Mechanical rule checks script for deleted tests, added skips and empty catch blocks.
+- Performance reference: measurement, query, budget and cache rules.
+- `LLM-COST` and `LLM-EVAL` in `llm-calls.md`.
+- `REVIEW-SPEC` spec-conformance review in `review.md`.
+- Line caps and rule-ID resolution enforced by `scripts/validate_skill.py` in CI.
+
 ## Install
 
 As a plugin, which gives you versioning and updates:
