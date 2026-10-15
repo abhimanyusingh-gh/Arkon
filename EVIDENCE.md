@@ -1,6 +1,6 @@
 # Evidence
 
-This file separates review findings, inspected commit history, operating experience, and engineering judgment. It is the audit trail for deciding which rules to keep when adapting the skill. A rule's presence here is not proof that it reduced defects.
+This file separates review findings, inspected commit history, operating experience, and engineering judgment. It is the audit trail for deciding which rules to keep when adapting the skill. A rule's presence here is not proof that it reduced defects. The findings describe engineering practice rather than any one assistant, but they were gathered in, and the skill has only been tested with, Claude Code. [`METHODOLOGY.md`](METHODOLOGY.md) summarizes the method and its limits.
 
 It lives outside `skills/` so routine tasks do not load the full research history. History-driven changes should consult it: evidence strength and counterexamples affect how a rule should be applied.
 

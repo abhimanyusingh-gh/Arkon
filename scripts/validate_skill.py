@@ -58,7 +58,7 @@ def validate():
             if not rule_is_defined(rule_id):
                 errors.append(f"references/{name}: undefined rule ID {rule_id}")
 
-    documents = [ROOT / "README.md", ROOT / "EVIDENCE.md", *SKILL.rglob("*.md"),
+    documents = [*ROOT.glob("*.md"), *ROOT.glob("packaging/*.md"), *SKILL.rglob("*.md"),
                  *ROOT.glob("docs/*.md"), *ROOT.glob("evals/**/*.md")]
     for path in documents:
         content = path.read_text()
