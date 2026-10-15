@@ -71,6 +71,7 @@ Read relevant references before designing or changing that boundary. A task may 
 |---|---|
 | New application, complex feature, architecture or domain design | `references/application-design.md` |
 | Deriving conventions from commit history or adapting this skill | `references/history.md` |
+| Binding the skill to project conventions or generating project context | `references/project-binding.md` |
 | Authentication, permissions, public input, uploads, URLs, secrets | `references/security.md` |
 | Customer data, queries, storage paths or cache keys | `references/tenancy.md` |
 | Production code, types, naming, config, layering or indices | `references/authoring.md` |
