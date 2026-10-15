@@ -22,6 +22,7 @@ This is a set of priors from historical findings and operating experience, not a
 | Partial success represented incorrectly | Does bulk rollback undo committed items only in the UI? Does one failure hide successes or an unknown tail? | `frontend.md` |
 | Hollow test evidence | Does the test fail for the intended defect? Are assertions weakened without a contract change, skips hidden, or the wrong revision tested? | `testing.md`, `verification.md` |
 | Unbounded data/work | Are queries, fan-out, retries, memory, payloads and backlogs bounded? Is the actual plan appropriate at representative size? | `authoring.md`, `integrations.md`, `delivery.md` |
+| Spec divergence or unrequested behavior | Does every stated requirement have an implementing path, and does the diff add behavior nobody requested? | `review.md` REVIEW-SPEC |
 
 Scope leaks, lost required capabilities, broken deployed contracts, privacy breaches, and uncontrolled irreversible effects are blockers. Missing evidence is a limitation to investigate; do not invent a product failure from an unavailable test alone.
 
