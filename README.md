@@ -15,13 +15,13 @@ Claude loads the core rules and a contract card, then follows the relevant refer
 | Reference | Covers |
 |---|---|
 | `application-design.md` | acceptance criteria, complete vertical slices, application boundaries, temporal data selection, and cross-field consistency |
-| `security.md` | authorization boundaries, untrusted input, secrets, and safe persisted results |
+| `security.md` | authorization boundaries, untrusted input, secrets, safe persisted results, the private-data/untrusted-content/outbound-effect trifecta, prompt injection, and an OWASP coverage map |
 | `tenancy.md` | scope isolation — every read, write, aggregate, storage path and cache key scoped; enforcement at the lowest layer; the negative test |
 | `authoring.md` | reuse, layering, dead code vs unwired capability, native domain types, naming, complexity, fail-closed configuration, database locking, and query plans |
 | `integrations.md` | external-call budgets, idempotency, asynchronous identity, and consistency across boundaries |
 | `async-jobs.md` | distributed execution, leases, claims and fencing, retirement, and real-database concurrency checks |
 | `observability.md` | safe logs and error responses, useful correlation, and content-leak sentinel tests |
-| `llm-calls.md` | model-call tracing, untrusted output validation, minimal prompts, and failure handling |
+| `llm-calls.md` | model-call tracing, untrusted output validation, minimal prompts, failure handling, cost budgets, and evaluation |
 | `dependencies.md` | advisory-driven remediation, dependency overrides, transitive changes, and real-application boot checks |
 | `frontend.md` | design fidelity, server/local state, inactive drafts, stale responses, AI preview acceptance, accessible errors, and bulk-operation partial failure |
 | `accessibility.md` | disabled-vs-aria-disabled, one interaction model per widget, announce-after-settle, focus and reduced motion, the per-PR baseline |
@@ -31,7 +31,10 @@ Claude loads the core rules and a contract card, then follows the relevant refer
 | `review.md` | root-cause reproduction, correctness review, folding findings, full-PR re-review, and escalation when defect patterns recur |
 | `workflow.md` | work intake, PR slicing, immutable and rolling-compatible migrations, gates, truthful commit subjects, merge policy, and docs currency |
 | `delivery.md` | deployed compatibility, release readiness, rollout, recovery, and post-deploy verification |
+| `performance.md` | measurement against a stated target, bounded and planned queries, explicit budgets, and scope-complete cache keys |
+| `agent-collaboration.md` | when an agent asks versus proceeds, reviewing agent-authored diffs, and instruction-file boundaries |
 | `orchestration.md` | bounded delegation, shared-state ownership, isolation, integration review, resource limits, and resumable handoffs |
+| `project-binding.md` | discovering the project's build, data and convention bindings with confidence levels, and treating them as evidence |
 | `history.md` | attributable history discovery, inspecting base/fix evidence, separating repeated patches from incidents, and calibrating proposed rules |
 
 Progressive disclosure keeps specialized guidance out of unrelated tasks. The author and reviewer read additional guides when they discover another affected boundary; there is no fixed three-reference ceiling.
@@ -73,6 +76,11 @@ flowchart TD
     Q6 -->|no| Q7{"Learning from history?"}
     R6 --> Q7
     Q7 -->|yes| R7["history.md"]
+    Q7 -->|no| Q8{"Performance target or agents?"}
+    R7 --> Q8
+    Q8 -->|performance| R8["performance.md"]
+    Q8 -->|agents| R9["agent-collaboration.md, orchestration.md"]
+    Start -.->|new repository| R10["project-binding.md"]
 ```
 
 ## Examples of the patterns
@@ -178,6 +186,7 @@ flowchart LR
 - `LLM-COST` and `LLM-EVAL` in `llm-calls.md`.
 - `REVIEW-SPEC` spec-conformance review in `review.md`.
 - Line caps and rule-ID resolution enforced by `scripts/validate_skill.py` in CI.
+- Update reminder at session start (`scripts/check_skill_version.py`); the marketplace is now `Arkon`.
 
 ## Install
 
