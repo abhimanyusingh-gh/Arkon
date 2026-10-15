@@ -1,6 +1,6 @@
 # Runtime readiness and recovery
 
-Use for deployment-sensitive changes, new applications, performance constraints, and completion claims that depend on runtime behavior. Deployment actions still require the user's authorization; preparing and testing the artifact does not authorize releasing it.
+Use for deployment-sensitive changes, new applications, and completion claims that depend on runtime behavior. Deployment actions still require the user's authorization; preparing and testing the artifact does not authorize releasing it.
 
 ## DELIVERY-READY — verify what will actually run
 
@@ -11,14 +11,11 @@ Use for deployment-sensitive changes, new applications, performance constraints,
 - For feature flags, exercise on, off, and lookup failure at the backend effect and UI state boundaries. Disablement must stop new dangerous work while defining what happens to in-flight work.
 - Check graceful shutdown: stop accepting work, drain or cancel within a bound, and leave leases/claims/messages recoverable. Test restart behavior for durable work.
 
-## Performance and observability
+## Operational signals
 
-Use a stated product target: expected data volume, concurrency, latency percentile, and resource/cost budget. Do not invent a benchmark result or add machinery without a need.
-
-- Examine the real query plan, pagination, N+1 calls, serialization, and external-call fan-out on the main path. Test representative cardinality/skew; a one-row fixture cannot establish scale.
-- Bound memory and work: batch/stream large results, cap uploads and response sizes, and specify backpressure for queues. Measure before claiming an optimization.
 - Expose health and operation outcomes sufficient to detect a stuck queue, failed write, elevated latency, and unexpected spend. Use low-cardinality, privacy-reviewed dimensions (`observability.md`).
 - Define an actionable alert and response owner for a new critical asynchronous failure mode. An error log without a recovery path is incomplete operation.
+- For latency, query and capacity work, see `performance.md`.
 
 ## DELIVERY-RECOVER — a release has an exit path
 
