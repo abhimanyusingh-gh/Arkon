@@ -85,7 +85,8 @@ Read relevant references before designing or changing that boundary. A task may 
 | Verifying completion, refactoring or preparing delivery | `references/verification.md` |
 | Reviewing a diff or folding findings | `references/defect-classes.md`, then `references/review.md` |
 | PR slicing, migrations, gates, commits or merge | `references/workflow.md` |
-| Runtime startup, performance, deployment or recovery | `references/delivery.md` |
+| Runtime startup, deployment or recovery | `references/delivery.md` |
+| Latency or throughput target, slow query, load, cache or scale claim | `references/performance.md` |
 | Delegating independent work or coordinating agents | `references/orchestration.md` |
 | Working with agents: asking vs proceeding, reviewing agent diffs, instruction files | `references/agent-collaboration.md` |
 
