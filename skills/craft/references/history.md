@@ -27,4 +27,4 @@ For each candidate rule, record the failure it prevents, trigger, concrete mecha
 - Prefer a small, decisive correction over adding another absolute. Keep the authoritative rule in one place; route to it from reviews and evidence.
 - Validate on a held-out realistic task, including a different stack when claiming stack neutrality. Check observable behavior and false positives, not whether an agent repeats the rule names.
 
-When updating this skill, keep provenance and confidence in the repository's `EVIDENCE.md`; keep the reusable decision and its trigger in the runtime reference. Report the limits of the available history rather than describing local inspection as an audit of the user's entire hosted account.
+When updating this skill, keep provenance and confidence in the repository's `docs/EVIDENCE.md`; keep the reusable decision and its trigger in the runtime reference. Report the limits of the available history rather than describing local inspection as an audit of the user's entire hosted account.

@@ -1,6 +1,6 @@
 # Publishing checklist
 
-Steps for the maintainer to run with their own accounts. Nothing here has been published by automation; every external post or upload is a deliberate maintainer action. Run the pre-release checks in [`docs/publish-checklist.md`](docs/publish-checklist.md) first.
+Steps for the maintainer to run with their own accounts. Nothing here has been published by automation; every external post or upload is a deliberate maintainer action. Run the pre-release checks in [`publish-checklist.md`](publish-checklist.md) first.
 
 ## Messaging rules
 
@@ -9,8 +9,8 @@ Use these in every channel.
 - **Claude Code skill:** "Engineering standards for Claude Code." The full feature set (skill, references, hooks, update reminder) is built for and tested in Claude Code.
 - **Discovery script:** "`arkon-discover` is a standalone, stdlib-only command that works with any IDE or tool." This is the only component designed and tested as tool-independent.
 - **Engineering references:** "Tool-agnostic principles, tested only in Claude Code."
-- **Evidence:** "Derived from 1,020 review comments in one codebase plus inspected history and operating experience; see METHODOLOGY.md for the limits." Never say the skill is proven to reduce defects.
-- **Do not claim** compatibility with GitHub Copilot, Cursor, Devin or any other assistant until it has been tested there and the test is recorded in `EVIDENCE.md`.
+- **Evidence:** "Derived from 1,020 review comments in one codebase plus inspected history and operating experience; see docs/03-METHODOLOGY.md for the limits." Never say the skill is proven to reduce defects.
+- **Do not claim** compatibility with GitHub Copilot, Cursor, Devin or any other assistant until it has been tested there and the test is recorded in `docs/EVIDENCE.md`.
 
 ## 1. PyPI (`arkon-discover`)
 
@@ -19,7 +19,7 @@ Use these in every channel.
 - [ ] Check the artifacts: `/tmp/arkon/bin/twine check dist/*`; install the wheel in a fresh venv and run `arkon-discover --help`.
 - [ ] Upload to TestPyPI first with your account token: `twine upload --repository testpypi dist/*`, then `pip install -i https://test.pypi.org/simple/ arkon-discover`.
 - [ ] Upload to PyPI: `twine upload dist/*`. Prefer a scoped API token or trusted publishing; never commit a token.
-- [ ] Remove "not yet published" from `packaging/README.md` and the README's 1.3.0 list in a follow-up PR.
+- [ ] Remove "not yet published" from `packaging/README.md` and the 1.3.0 list in `docs/01-GETTING_STARTED.md` in a follow-up PR.
 
 ## 2. GitHub release
 
@@ -38,18 +38,18 @@ session-start update reminder. The marketplace is now Arkon:
 Standalone: arkon-discover, a stdlib-only project-context detector that runs
 with any IDE or tool (PyPI release pending).
 
-Tested in Claude Code only. Methodology and limits: METHODOLOGY.md.
+Tested in Claude Code only. Methodology and limits: docs/03-METHODOLOGY.md.
 ```
 
 ## 3. Blog post (Dev.to, Medium, personal blog)
 
 - [ ] Title: "Engineering standards for Claude Code, with the evidence behind each rule".
-- [ ] Outline: the problem (agents pass gates while losing behavior), how rules were derived (link METHODOLOGY.md), three examples from the README, what is not proven, how to install, the standalone discovery script.
+- [ ] Outline: the problem (agents pass gates while losing behavior), how rules were derived (link docs/03-METHODOLOGY.md), three examples from the README, what is not proven, how to install, the standalone discovery script.
 - [ ] Publish on one platform first; cross-post with a canonical URL.
 
 ## 4. Social and forums
 
-- [ ] **LinkedIn / X:** "Arkon 1.3.0: engineering standards for Claude Code, each rule traced to review evidence or labelled as judgment. Includes arkon-discover, a standalone project-context detector for any tool. Limits documented: <link to METHODOLOGY.md>"
+- [ ] **LinkedIn / X:** "Arkon 1.3.0: engineering standards for Claude Code, each rule traced to review evidence or labelled as judgment. Includes arkon-discover, a standalone project-context detector for any tool. Limits documented: <link to docs/03-METHODOLOGY.md>"
 - [ ] **Hacker News (Show HN):** "Show HN: Arkon – evidence-labelled engineering standards for Claude Code". First comment: what it is, how the evidence was counted, the single-operator and automated-review limitations.
 - [ ] **Discord:** a short post with the install command and the methodology link.
 

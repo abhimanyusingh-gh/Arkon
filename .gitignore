@@ -1,5 +1,18 @@
-# Python packaging artifacts (arkon-discover)
+# Python packaging and caches (arkon-discover)
 build/
 dist/
 *.egg-info/
 __pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Generated project context (project-binding discovery)
+.claude/craft-context.json
+.claude/settings.local.json
+
+# Editors and OS
+.idea/
+.DS_Store
+*~
