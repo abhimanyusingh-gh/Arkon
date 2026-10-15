@@ -87,5 +87,6 @@ Read relevant references before designing or changing that boundary. A task may 
 | PR slicing, migrations, gates, commits or merge | `references/workflow.md` |
 | Runtime startup, performance, deployment or recovery | `references/delivery.md` |
 | Delegating independent work or coordinating agents | `references/orchestration.md` |
+| Working with agents: asking vs proceeding, reviewing agent diffs, instruction files | `references/agent-collaboration.md` |
 
 Evidence and its limits live in the repository's `EVIDENCE.md`; do not load it for routine coding. This skill aims to improve decision coverage; correctness still requires execution and independent review.
