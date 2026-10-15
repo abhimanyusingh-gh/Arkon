@@ -2,11 +2,13 @@
 
 Skills for [Claude Code](https://claude.com/claude-code).
 
+Built for Claude Code. The discovery script works standalone with any IDE. The engineering references state tool-agnostic principles, but the skill has only been used and tested in Claude Code.
+
 ## craft
 
 Engineering guidance for developing and maintaining production applications: define acceptance criteria, design boundaries, implement complete slices, review behavior, verify the real application, and prepare a recoverable release. It applies across stacks and includes guidance for agent fleets.
 
-The skill combines a reported corpus of 1,020 review comments, inspected local authored history, operating experience, and supplemental engineering judgment. [`EVIDENCE.md`](EVIDENCE.md) separates those sources, records counterexamples and unresolved counting limitations, and avoids treating commits or test classes as independent defects. It does not establish that installing the skill reduces defects.
+The skill combines a reported corpus of 1,020 review comments, inspected local authored history, operating experience, and supplemental engineering judgment. [`EVIDENCE.md`](EVIDENCE.md) separates those sources, records counterexamples and unresolved counting limitations, and avoids treating commits or test classes as independent defects. It does not establish that installing the skill reduces defects. [`METHODOLOGY.md`](METHODOLOGY.md) explains how the evidence was collected and counted, and what it does not show.
 
 Use the lifecycle mode that matches the work: design, implement, review, verify, deliver, or learn from history. Define observable acceptance criteria before coding; include authorization, data consistency, integration failure, and deployment behavior when the change touches them. Review and verification follow the changed behavior through real consumers and dependencies.
 
@@ -186,6 +188,8 @@ flowchart LR
 - `LLM-COST` and `LLM-EVAL` in `llm-calls.md`.
 - `REVIEW-SPEC` spec-conformance review in `review.md`.
 - Line caps and rule-ID resolution enforced by `scripts/validate_skill.py` in CI.
+- Standalone `arkon-discover` package configuration (`pyproject.toml`, standard library only); ready for PyPI, not yet published.
+- [`METHODOLOGY.md`](METHODOLOGY.md): how the evidence was collected, counted and limited.
 - Update reminder at session start (`scripts/check_skill_version.py`); the marketplace is now `Arkon`.
 
 ## Install

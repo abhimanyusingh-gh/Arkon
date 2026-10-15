@@ -1,0 +1,5 @@
+# Python packaging artifacts (arkon-discover)
+build/
+dist/
+*.egg-info/
+__pycache__/
