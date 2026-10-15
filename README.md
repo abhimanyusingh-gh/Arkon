@@ -1,4 +1,4 @@
-# software-craftsmanship
+# Arkon
 
 Skills for [Claude Code](https://claude.com/claude-code).
 
@@ -184,21 +184,23 @@ flowchart LR
 As a plugin, which gives you versioning and updates:
 
 ```
-/plugin marketplace add abhimanyusingh-gh/software-craftsmanship
-/plugin install craft@software-craftsmanship
+/plugin marketplace add abhimanyusingh-gh/Arkon
+/plugin install craft@Arkon
 ```
 
 Or symlink it directly, if you'd rather track `main` and edit in place:
 
 ```bash
-git clone https://github.com/abhimanyusingh-gh/software-craftsmanship.git
+git clone https://github.com/abhimanyusingh-gh/Arkon.git
 mkdir -p ~/.claude/skills
-ln -s "$(pwd)/software-craftsmanship/skills/craft" ~/.claude/skills/craft
+ln -s "$(pwd)/Arkon/skills/craft" ~/.claude/skills/craft
 ```
 
 For a single project, copy `skills/craft/` into `<project>/.claude/skills/craft/` and commit the skill files so the team receives the same version.
 
 Claude invokes the skill on its own when a task matches the description; `/craft` invokes it explicitly.
+
+The plugin auto-checks for updates at session start and reminds you when a new version is available (at most once a day, never blocking). Run `python3 scripts/check_skill_version.py` to check by hand.
 
 ## Adapting it
 

@@ -1,0 +1,17 @@
+{
+  "description": "Remind the user when a newer craft release exists; never blocks the session.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/scripts/check_skill_version.py\" --hook",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

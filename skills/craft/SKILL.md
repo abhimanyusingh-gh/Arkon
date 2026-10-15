@@ -91,4 +91,4 @@ Read relevant references before designing or changing that boundary. A task may 
 | Delegating independent work or coordinating agents | `references/orchestration.md` |
 | Working with agents: asking vs proceeding, reviewing agent diffs, instruction files | `references/agent-collaboration.md` |
 
-Evidence and its limits live in the repository's `EVIDENCE.md`; do not load it for routine coding. This skill aims to improve decision coverage; correctness still requires execution and independent review.
+The plugin checks GitHub for a newer release at session start and suggests `/plugin install craft@Arkon` when one exists; the check never blocks. Evidence and its limits live in the repository's `EVIDENCE.md`; do not load it for routine coding. This skill aims to improve decision coverage; correctness still requires execution and independent review.
