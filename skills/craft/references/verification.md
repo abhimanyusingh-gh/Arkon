@@ -37,6 +37,10 @@ Legitimate subtractive diffs include consolidation/replacement, removing an inco
 
 Preserve critical business/security invariants, historical-regression protection and real-datastore guarantees for unchanged behavior, even if tests move. Name the load-bearing checks in risky handoffs. A shrinking test count is a review signal, not proof that a capability was lost.
 
+**CATCH-EMPTY — an added empty catch block hides failure.** Handle, rethrow with context, or document why the error is impossible; see `observability.md`.
+
+Run `python3 skills/craft/scripts/check_rules.py <base> HEAD` for the mechanical part of these checks: deleted or renamed tests, net-removed assertions, added skips in test files and empty catch blocks. A line containing `check-rules: ignore` is skipped; use it only for fixture literals. A clean run is not a review.
+
 ## HARNESS-MASK — a test that supplies context production doesn't
 
 A unit test may legitimately supply a provider. It establishes behavior under that dependency, not that production supplies it. A leaf suite can be green while every real route fails at startup.
