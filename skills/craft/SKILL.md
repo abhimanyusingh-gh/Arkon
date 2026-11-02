@@ -17,7 +17,7 @@ Use this skill to turn a product request into working, verifiable software. Scal
 6. **Design failure paths.** Bound external work and retries; specify partial failure, concurrency, duplicate delivery, and recovery before adding side effects. Do not claim exactly-once behavior from a lease alone.
 7. **Prove behavior.** Run the applicable repository gates and report their actual output, skips, and limitations. Verify real composition and lost capabilities as well as individual units. An unrun check is never a pass.
 8. **Keep sensitive content out of telemetry.** Validate external input and model output; minimize disclosed data. Security and privacy guarantees require negative tests at the relevant boundary.
-9. **Deliver within authorization.** Keep docs current, use truthful commits, and respect existing approval and branch-protection rules. Commit, push, open a PR, merge, and deploy only within the user's authorized scope. Never add assistant attribution or co-author trailers.
+9. **Deliver within authorization.** Keep docs current, use truthful commits, and respect existing approval and branch-protection rules. Commit, push, open a PR, merge, and deploy only within the user's authorized scope. No assistant attribution or co-author trailers on commits or PRs; see [COMMIT-NO-ATTRIB](references/workflow.md).
 
 Severity: `blocker` means unsafe or broken behavior that must not ship; `should-fix` belongs in this change; `nit` is advisory. Severity follows demonstrated impact, not the number of style violations.
 
@@ -65,13 +65,14 @@ Product       acceptance criteria; design source; tracker/issue when one exists
 
 ## References — load when the work reaches that boundary
 
-Read relevant references before designing or changing that boundary. A task may need several, loaded as needed rather than all at once. Examples and historical fixes are not universal stack requirements.
+Read relevant references before designing or changing that boundary. A task may need several, loaded as needed rather than all at once. Examples and historical fixes are not universal stack requirements. After reading the repository, load only the stack profiles whose match signals fit, and record which profile files were read on the contract card.
 
 | Trigger | Read |
 |---|---|
 | New application, complex feature, architecture or domain design | `references/application-design.md` |
 | Deriving conventions from commit history or adapting this skill | `references/history.md` |
 | Binding the skill to project conventions or generating project context | `references/project-binding.md` |
+| Working in a recognised stack (JVM/Maven service, React/TypeScript UI, Apex/LWC, deploy/config repos, SQL migrations, LLM-backed features) | `references/stacks/README.md` |
 | Authentication, permissions, public input, uploads, URLs, secrets | `references/security.md` |
 | Customer data, queries, storage paths or cache keys | `references/tenancy.md` |
 | Production code, types, naming, config, layering or indices | `references/authoring.md` |
@@ -86,6 +87,7 @@ Read relevant references before designing or changing that boundary. A task may 
 | Verifying completion, refactoring or preparing delivery | `references/verification.md` |
 | Reviewing a diff or folding findings | `references/defect-classes.md`, then `references/review.md` |
 | PR slicing, migrations, gates, commits or merge | `references/workflow.md` |
+| Writing tickets, stories, wiki pages or design docs | `references/documentation.md` |
 | Runtime startup, deployment or recovery | `references/delivery.md` |
 | Latency or throughput target, slow query, load, cache or scale claim | `references/performance.md` |
 | Delegating independent work or coordinating agents | `references/orchestration.md` |
