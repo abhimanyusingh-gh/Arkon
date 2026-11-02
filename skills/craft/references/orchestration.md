@@ -29,7 +29,7 @@ Prefer isolated worktrees/checkouts for independent branch work when the host su
 
 In a shared tree, only the agent the brief designates as tree owner changes branches, stages, commits, or shared dependencies — never the orchestrator, unless the user waived ORCH-ROLE. Never let a worker reset, stash, rebase, or clean another agent's/user's work. Treat the index, branch, environment, dependency install, database, and runtime ports as shared state. A worker stays in its assigned path for the whole session.
 
-Before creating a new branch/worktree, choose the intended base and refresh it when feasible and appropriate. Do not change a branch the user explicitly asked to retain. Worktree cleanup uses git's supported removal and never removes a dirty or active tree.
+Before creating a new branch/worktree, choose the intended base and start from a freshly fetched remote ref per [GIT-FRESH-BASE](workflow.md). Do not change a branch the user explicitly asked to retain. Worktree cleanup uses git's supported removal and never removes a dirty or active tree.
 
 WIP pushes, mirror updates, deployments, tracker changes, and external reviews follow [GIT-NO-WIP-PUSH](workflow.md) and the user's authorization, including an already-approved batch.
 

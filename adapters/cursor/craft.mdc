@@ -34,7 +34,7 @@ If the host delegates work to agents:
 
 ## Git and PRs
 
-- GIT-REBASE-LOCAL: update a feature branch by local rebase and push with `--force-with-lease`. Do not use the host's update-branch button.
+- GIT-REBASE-LOCAL: update a feature branch by local rebase, unless repository policy says otherwise, and push with `--force-with-lease` only when pushing is authorized. Do not use the host's update-branch button.
 - GIT-NO-WIP-PUSH: push only finished, linter-clean commits. Never push WIP or placeholder commits.
 - GIT-BRANCH-FORM and COMMIT-TRUTH: follow the repository's branch and subject format. The subject describes this commit's diff.
 - GATE-FORMAT-LINT: run the format check, the linter and the commit-linter as separate gate rows before any push.
@@ -55,11 +55,11 @@ If the host delegates work to agents:
 Read the repository's own instruction file first. It overrides these notes.
 
 - JVM Maven service: run the format check first, then compile, then the unit and integration phases unfiltered. A zero-test run is a failure. Never enable clean, repair or skip-validate on a shared environment.
-- React TypeScript UI: run typecheck, lint, unit tests and the production build as separate gates. Do not use inline `style` props. Never delete an assertion to get green.
+- React TypeScript UI: run typecheck, lint, unit tests and the production build as separate gates. Follow the repository's styling convention; where it bans inline styles, only assign runtime CSS variables. Never delete an assertion to get green.
 - Salesforce Apex and LWC: no SOQL, DML or callouts inside loops. Test at least one batch of 200 records. Run a check-only deployment before merge.
 - Config and deploy repos: name the target environment, paste the rendered diff, keep plaintext secrets out, and state the exact revert path.
 - SQL migrations: never edit an applied versioned migration. Test against a disposable database built from the prior schema. Expand, then contract.
-- LLM-backed features: enforce invariants in code, not only in the prompt. Keep verdicts out of prompts. Log no clinical or personal text.
+- LLM-backed features: enforce invariants in code, not only in the prompt. Keep verdicts out of prompts. Log no personal or sensitive text.
 
 ## Full skill
 

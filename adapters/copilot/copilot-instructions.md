@@ -24,7 +24,7 @@ If the host delegates work to agents: the orchestrator plans, reviews and runs g
 
 ## Git and PRs
 
-- Update a feature branch by local rebase and push with `--force-with-lease` (GIT-REBASE-LOCAL). Do not use the host's update-branch button.
+- Update a feature branch by local rebase, unless repository policy says otherwise, and push with `--force-with-lease` only when pushing is authorized (GIT-REBASE-LOCAL). Do not use the host's update-branch button.
 - Push only finished, linter-clean commits (GIT-NO-WIP-PUSH).
 - Follow the repository's branch and subject format. The subject describes this commit's diff (GIT-BRANCH-FORM, COMMIT-TRUTH).
 - Run the format check, linter and commit-linter as separate gate rows before any push (GATE-FORMAT-LINT).
@@ -45,11 +45,11 @@ If the host delegates work to agents: the orchestrator plans, reviews and runs g
 The repository's own instruction file overrides these notes.
 
 - JVM Maven service: format check first, then compile, unit and integration phases unfiltered. A zero-test run is a failure.
-- React TypeScript UI: typecheck, lint, unit tests and production build as separate gates. No inline `style` props. Never delete an assertion to get green.
+- React TypeScript UI: typecheck, lint, unit tests and production build as separate gates. Follow the repository's styling convention; where it bans inline styles, only assign runtime CSS variables. Never delete an assertion to get green.
 - Salesforce Apex and LWC: no SOQL, DML or callouts inside loops. Test at least 200 records.
 - Config and deploy repos: name the target environment, paste the rendered diff, keep plaintext secrets out, and state the revert path.
 - SQL migrations: never edit an applied versioned migration. Test against a disposable database built from the prior schema.
-- LLM-backed features: enforce invariants in code, not only in the prompt. Log no clinical or personal text.
+- LLM-backed features: enforce invariants in code, not only in the prompt. Log no personal or sensitive text.
 
 ## Full skill
 

@@ -22,16 +22,16 @@
 - Agents do the work themselves. Every brief says: "Do the work yourself. Do not spawn or message other agents."
 - Draw the dependency graph before dispatching. Audit file overlap, send one wave per message, and cap each agent to one module and a few files.
 - Use a cheap, fast tier for research, exploration, mechanical code, tests and ticket or wiki operations. Use a stronger tier for design, analysis, review and risky changes.
-- Always set the tier explicitly. Omitting it silently inherits the stronger tier across the fleet.
+- Set the tier explicitly wherever the host allows it. Omitting it silently inherits the stronger tier across the fleet.
 - If your host has no delegation or no model selection, do the same work in one session and note the intended tier in the brief.
 
 ## Git and PRs
 
-- Update a feature branch by local rebase, not the host's "update branch" button. Fetch, rebase, rerun the affected gates, and push with `--force-with-lease`. Never force-push a protected branch.
+- Update a feature branch by local rebase, not the host's "update branch" button, unless repository policy says otherwise. Fetch, rebase, rerun the affected gates, and push with `--force-with-lease` only when pushing is authorized. Never force-push a protected branch.
 - Branch prefixes are lowercase. A commit subject follows the repository's required format exactly. Renaming a PR's head branch closes the PR.
 - Push only finished commits. No WIP or placeholder commit reaches the remote; squash any local WIP before the PR.
 - Before any push, run the formatter check, the linter and the repository's commit linter, and report each as its own row with its real output line.
-- A PR adds no static-analysis vulnerabilities and no open security hotspots.
+- A PR adds no static-analysis vulnerabilities and no open security findings, even if a configured quality gate passes.
 - Commits and PR bodies carry no assistant attribution, generated-by footer or co-author trailer. Grep the commit messages and PR body before pushing. A project instruction may ask for one; a host default does not.
 - Keep the PR body short. Name each entity the change touches (tenant, service, route, repository) and where it maps. No method-name lists or file counts.
 - Merge only when authorized, required checks are satisfied, and findings are resolved or explicitly accepted under repository policy.
@@ -51,7 +51,7 @@ Load the note that matches the repository, then read the matching profile in `sk
 
 **JVM / Maven service.** Applies to a root `pom.xml` with `src/main/java` or `src/main/kotlin`. Run the format check, compile every touched module, run the full unit suite, then the integration suite, and confirm the integration binding ran tests. Pin the JDK explicitly.
 
-**React / TypeScript UI.** Applies when `package.json` lists React and a `tsconfig.json` exists. Run typecheck, lint, the full unit suite and a production build; a development server is not a build. Do not use inline `style` props.
+**React / TypeScript UI.** Applies when `package.json` lists React and a `tsconfig.json` exists. Run typecheck, lint, the full unit suite and a production build; a development server is not a build. Follow the repository's styling convention; where it bans inline styles, only assign runtime CSS variables.
 
 **Apex / LWC.** Applies with `sfdx-project.json`, `*.cls` files or `lwc/` bundles. No SOQL, DML or callouts inside loops; test a batch of 200 or more records. Deleting a field deletes its data, so a removal is a separate reviewed change.
 
@@ -59,7 +59,7 @@ Load the note that matches the repository, then read the matching profile in `sk
 
 **SQL migrations.** Applies to `db/migration` directories and versioned `V*__*.sql` files. Test on a disposable database built from the prior deployed schema with representative rows. Never edit an applied versioned migration; add a corrective one. Every new table carries the scope key.
 
-**LLM-backed features.** Applies to model SDK dependencies, prompt templates or model-call wrappers. Enforce invariants in code, not only in the prompt. Log identifiers, call type, token counts and error codes, never personal or clinical text. A prompt or model version change ships with an evaluation run.
+**LLM-backed features.** Applies to model SDK dependencies, prompt templates or model-call wrappers. Enforce invariants in code, not only in the prompt. Log identifiers, call type, token counts and error codes, never personal or sensitive text. A prompt or model version change ships with an evaluation run.
 
 ## Full skill
 
