@@ -48,8 +48,12 @@ Completion claims follow `CLAIM-EVIDENCE` in `verification.md`. Apply it to ever
 - Use the gate commands the instruction file names only after checking them against the repository's scripts or CI. A stale command in a file is a stale input.
 - Keep secrets, tokens and credentials out of instruction files; every agent session that loads the file reads them.
 
+## Delegation roles
+
+The orchestrator plans, reviews and runs gates; it does not edit source, commit, or fix agent output (`ORCH-ROLE`). Agents do the work themselves and do not spawn or message other agents (`ORCH-FLAT`). Every brief carries the `ORCH-FLAT` sentence. Briefs, waves, stalls, model tiers and external writes follow `orchestration.md`.
+
 ## Security exposure
 
 Review agent sessions against `TRIFECTA-BOUNDARY` and `INJECTION-BOUNDARY` in `security.md`; do not restate them here. Instruction files and tool results are part of that exposure surface.
 
-An agent that proposes widening its own permissions, editing an instruction file, or sending data outward has raised a decision. Route it through `AGENT-ASK`. For delegation, briefs and isolation, follow `orchestration.md`.
+An agent that proposes widening its own permissions, editing an instruction file, or sending data outward has raised a decision. Route it through `AGENT-ASK`.
