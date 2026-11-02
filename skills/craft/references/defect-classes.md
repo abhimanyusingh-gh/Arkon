@@ -42,3 +42,15 @@ Scope leaks, lost required capabilities, broken deployed contracts, privacy brea
 Conventions follow the actual language and repository. A raw string, native disabled attribute, inline style, or repeated field declaration is not inherently a bug. Explain the concrete drift or risk before proposing a correction. A numeric heuristic is a prompt to inspect, not a severity calculation.
 
 Useful searches include removed tests, hardcoded replacements, exception-message access, missing scopes, repeated endpoint/key strings, skip markers, and catch-and-continue. Read the surrounding implementation and base version before turning a match into a finding.
+
+## Rules for classes the tables do not name
+
+**LLM-INVARIANT-CODE — enforce model-output invariants in code, not only in the prompt.** A stored verdict must not contradict its inputs, and thresholds and counts are checked by a validator or sanitiser after parsing. Prompt wording is advisory; the code path is the control. Keep control content (verdict labels, scoring markers, routing tokens) out of prompts where the model can echo it into output. When the same output class has been fixed more than once, move the invariant into code instead of revising the prompt again. Extends `LLM-FAILSAFE` in `llm-calls.md`.
+
+**PICK-DUPLICATE — one change lives on one branch.** Before opening or pushing, check for the same change replayed on several branches (`git cherry` against the base, or patch-ids). Consolidate onto one branch rather than carrying duplicates. A duplicate cherry-pick is a review finding.
+
+**CONTRACT-LIVE — a dependency on another service is verified on that service's main branch.** When a change calls another service's endpoint or reads its schema, confirm on that service's main branch that the endpoint and fields still exist before merge. Record the dependency and the verified revision in the PR body.
+
+**LIB-NATIVE-FIRST — check the library's own API before writing custom code or CSS.** Read the library's type definitions or documented options for a native feature first. Port an approved mockup verbatim: copy its paths, formulas and markup rather than paraphrasing them. A paraphrased port that changes behaviour is a blocker.
+
+**DOC-CHECK — re-read a published document after writing it.** Read wiki pages and runbooks back after the write. Remove placeholder text. Tick template checkboxes only for items actually done. Link tickets and PRs instead of printing raw commit hashes.
