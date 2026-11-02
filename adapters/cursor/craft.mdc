@@ -1,0 +1,66 @@
+---
+description: Engineering standards condensed from the craft skill, covering production code, tests, reviews and pull requests.
+globs: []
+alwaysApply: false
+---
+
+> **Experimental — untested on this platform.** Condensed from the craft skill (skills/craft/). Not extensively tested on Cursor. Do not rely on it as a compatibility claim.
+
+# Craft rules (condensed)
+
+This is a summary of the craft skill, not the skill itself. The skill's `SKILL.md` and `references/` folder are the source of truth.
+
+## Principles
+
+- Preserve intent: name the requested outcome and the existing behavior that must survive.
+- Protect boundaries: derive customer scope from trusted authentication and enforce it at the data or action boundary, including jobs, exports, caches and storage.
+- Ground decisions: read the repository's instructions, callers, tests and schema before choosing a pattern. Search for reuse first.
+- Keep changes coherent: implement one useful slice at a time and flag adjacent cleanup rather than expanding scope.
+- Make invariants explicit: use native types, schemas and database constraints, and brand values where a real mix-up is possible.
+- Design failure paths: bound external work and retries, and specify partial failure, duplicate delivery and recovery before adding side effects.
+- Prove behavior: run the repository's gates and report actual output, skips and limits. An unrun check is never a pass.
+- Keep sensitive content out of telemetry, and validate external input and model output.
+- Deliver within authorization: keep docs current, write truthful commits, and respect approval and branch-protection rules.
+
+Severity: `blocker` must not merge; `should-fix` belongs in this change; `nit` is advisory.
+
+## Agents and delegation
+
+If the host delegates work to agents:
+
+- ORCH-ROLE: the orchestrator plans, delegates, reviews and runs gates. It does not edit source itself.
+- ORCH-FLAT: agents do the work themselves and never delegate further. Every brief says so.
+- ORCH-MODEL: set the model tier explicitly on each agent. An omitted tier inherits the strongest one.
+
+## Git and PRs
+
+- GIT-REBASE-LOCAL: update a feature branch by local rebase and push with `--force-with-lease`. Do not use the host's update-branch button.
+- GIT-NO-WIP-PUSH: push only finished, linter-clean commits. Never push WIP or placeholder commits.
+- GIT-BRANCH-FORM and COMMIT-TRUTH: follow the repository's branch and subject format. The subject describes this commit's diff.
+- GATE-FORMAT-LINT: run the format check, the linter and the commit-linter as separate gate rows before any push.
+- GATE-VULN-ZERO: a PR adds no new static-analysis vulnerabilities. A suppression needs an owner and an expiry.
+- COMMIT-NO-ATTRIB: no assistant attribution, generated-by footer or co-author trailer in commits or PR bodies, unless the project or user asks for one.
+- Never bypass hooks or branch protection, and never force-push a protected branch.
+
+## Verification
+
+- CLAIM-EVIDENCE: a gate is proven by its command and actual output. A gate that could not run is reported as `NOT RUN: <reason>`.
+- CLAIM-REPRO: reproduce an agent's "cannot run" claim once before accepting it.
+- REGRESS-DIFF: on a refactor, diff against the base for what was lost, not only what was added. Check vanished domain terms, removed tests, and literals that replaced computed values.
+- TEST-NODELETE: deleting, skipping or weakening a test to reach green is a blocker. Fix the product, the fixture or a demonstrably wrong test instead.
+- TEST-REBASE-LOSS: after a rebase or conflict resolution, compare test counts and test-file line counts with the base.
+
+## Stack notes
+
+Read the repository's own instruction file first. It overrides these notes.
+
+- JVM Maven service: run the format check first, then compile, then the unit and integration phases unfiltered. A zero-test run is a failure. Never enable clean, repair or skip-validate on a shared environment.
+- React TypeScript UI: run typecheck, lint, unit tests and the production build as separate gates. Do not use inline `style` props. Never delete an assertion to get green.
+- Salesforce Apex and LWC: no SOQL, DML or callouts inside loops. Test at least one batch of 200 records. Run a check-only deployment before merge.
+- Config and deploy repos: name the target environment, paste the rendered diff, keep plaintext secrets out, and state the exact revert path.
+- SQL migrations: never edit an applied versioned migration. Test against a disposable database built from the prior schema. Expand, then contract.
+- LLM-backed features: enforce invariants in code, not only in the prompt. Keep verdicts out of prompts. Log no clinical or personal text.
+
+## Full skill
+
+The complete rules, with tenancy, accessibility, async-job, observability and security references, are in the craft skill (`skills/craft/SKILL.md`). Load it when the host supports skills; this file does not replace it.

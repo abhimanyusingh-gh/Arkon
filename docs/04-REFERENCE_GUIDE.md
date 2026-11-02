@@ -1,6 +1,6 @@
 # Reference guide
 
-The skill's entry point is [`SKILL.md`](../skills/craft/SKILL.md): working invariants, the application workflow, the evidence card and the routing table. It loads each of the 22 references below only when the work reaches that boundary, so specialized guidance stays out of unrelated tasks. A complex change may need several; there is no fixed limit.
+The skill's entry point is [`SKILL.md`](../skills/craft/SKILL.md): working invariants, the application workflow, the evidence card and the routing table. It loads each of the 23 references below only when the work reaches that boundary, and loads a stack profile from [`stacks/`](../skills/craft/references/stacks/README.md) only when the repository matches its signals, so specialized guidance stays out of unrelated tasks. A complex change may need several; there is no fixed limit.
 
 ## References
 
@@ -17,16 +17,18 @@ The skill's entry point is [`SKILL.md`](../skills/craft/SKILL.md): working invar
 | [`dependencies.md`](../skills/craft/references/dependencies.md) | advisory-driven remediation, dependency overrides, transitive changes, and real-application boot checks |
 | [`frontend.md`](../skills/craft/references/frontend.md) | design fidelity, server/local state, inactive drafts, stale responses, AI preview acceptance, accessible errors, and bulk-operation partial failure |
 | [`accessibility.md`](../skills/craft/references/accessibility.md) | disabled-vs-aria-disabled, one interaction model per widget, announce-after-settle, focus and reduced motion, the per-PR baseline |
-| [`testing.md`](../skills/craft/references/testing.md) | invariants and negative tests, characterization and concurrency tests, seed data, meaningful test updates, and unit-to-browser execution |
-| [`verification.md`](../skills/craft/references/verification.md) | proving a claim rather than making one — gate evidence, the base-vs-branch regression diff, green-by-deletion, harness masking, selector inventories, the browser-spec pass |
-| [`defect-classes.md`](../skills/craft/references/defect-classes.md) | the reviewer's entry point — historical defect shapes and affected production boundaries, with severity tied to the consequence |
+| [`testing.md`](../skills/craft/references/testing.md) | invariants and negative tests, characterization and concurrency tests, seed data, meaningful test updates, rebase-loss checks, bindings that must run their tests, and unit-to-browser execution |
+| [`verification.md`](../skills/craft/references/verification.md) | proving a claim rather than making one — gate evidence, reproducing an agent's "cannot run" claim, the base-vs-branch regression diff, green-by-deletion, harness masking, selector inventories, the browser-spec pass |
+| [`defect-classes.md`](../skills/craft/references/defect-classes.md) | the reviewer's entry point — historical defect shapes (duplicate branches, unverified cross-service contracts, native library APIs, doc drift) and affected production boundaries, with severity tied to the consequence |
 | [`review.md`](../skills/craft/references/review.md) | root-cause reproduction, correctness review, folding findings, full-PR re-review, and escalation when defect patterns recur |
-| [`workflow.md`](../skills/craft/references/workflow.md) | work intake, PR slicing, immutable and rolling-compatible migrations, gates, truthful commit subjects, merge policy, and docs currency |
+| [`workflow.md`](../skills/craft/references/workflow.md) | work intake, PR slicing, immutable and rolling-compatible migrations, gates, branch, commit and PR rules (fresh base, no WIP push, no attribution), merge policy, and docs currency |
+| [`documentation.md`](../skills/craft/references/documentation.md) | tickets and stories that are small and objective, short verified docs, orchestrator-planned record writes by the cheap tier, and re-reading what was published |
+| [`stacks/README.md`](../skills/craft/references/stacks/README.md) | stack profiles (JVM service, React UI, Salesforce, config and deploy, SQL migrations, LLM features), each loaded on a match of repository signals and naming its gates and pitfalls |
 | [`delivery.md`](../skills/craft/references/delivery.md) | deployed compatibility, release readiness, rollout, recovery, and post-deploy verification |
 | [`performance.md`](../skills/craft/references/performance.md) | measurement against a stated target, bounded and planned queries, explicit budgets, and scope-complete cache keys |
 | [`agent-collaboration.md`](../skills/craft/references/agent-collaboration.md) | when an agent asks versus proceeds, reviewing agent-authored diffs, and instruction-file boundaries |
-| [`orchestration.md`](../skills/craft/references/orchestration.md) | bounded delegation, shared-state ownership, isolation, integration review, resource limits, and resumable handoffs |
-| [`project-binding.md`](../skills/craft/references/project-binding.md) | discovering the project's build, data and convention bindings with confidence levels, and treating them as evidence |
+| [`orchestration.md`](../skills/craft/references/orchestration.md) | orchestrator-only delegation with flat agents, shared-state ownership, isolation, model-tier choice, verification of returned work, the external-write approval, and resumable handoffs |
+| [`project-binding.md`](../skills/craft/references/project-binding.md) | discovering the project's build, data, convention and environment bindings with confidence levels, confirming a target before config writes, and treating bindings as evidence |
 | [`history.md`](../skills/craft/references/history.md) | attributable history discovery, inspecting base/fix evidence, separating repeated patches from incidents, and calibrating proposed rules |
 
 ## When each reference loads

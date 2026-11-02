@@ -4,6 +4,17 @@ This file separates review findings, inspected commit history, operating experie
 
 It lives outside `skills/` so routine tasks do not load the full research history. History-driven changes should consult it: evidence strength and counterexamples affect how a rule should be applied.
 
+## Platform coverage
+
+| Platform | Status | Evidence |
+|---|---|---|
+| Claude Code | tested | Maintainer's own use. No behavioural A/B has been run; see [Version 1.4.0 additions](#version-140-additions) for limits. |
+| GitHub Copilot | not extensively tested | no recorded run |
+| Cursor | not extensively tested | no recorded run |
+| Others | untested | none |
+
+Adapters in `adapters/` are experimental and unverified on every platform. A platform moves to "tested" only when a run is recorded here with its date, skill version, host version and result.
+
 ## Corpus
 
 The original review audit covered three private production codebases, referred to here only as Repo A, Repo B and Repo C. The later commit-history audits below are separate sources; the repository aliases do not establish that the corpora are independent.
@@ -262,6 +273,22 @@ These additions are supplemental engineering judgment. None was derived from the
 | 9 | `REVIEW-SPEC` | engineering judgment | `APP-ACCEPTANCE` and the evidence card | not evaluated on held-out review cases |
 
 Also in 1.3.0: README examples and diagrams (documentation only), an update reminder hook, and validator enforcement of reference line caps and rule-ID resolution. A behavioral A/B evaluation of these additions (item 1) is deferred to 1.4.0; until it runs, treat 1.3.0 as structurally validated only.
+
+## Version 1.4.0 additions
+
+Rule rows are operating experience from the maintainer's own repositories, identified after the 1.3.0 release by reviewing the commit history and the corrections recorded from it. They are not reproduced by this repository, and no commit counts are stated here. The behavioural A/B deferred from 1.3.0 is still not run, so 1.4.0 is structurally validated only.
+
+| Item | Added | Evidence label | Source | Limitation |
+|---|---|---|---|---|
+| ORCH-*: orchestration and model-tier rules | `orchestration.md` | operating experience (maintainer's own repositories, not reproducible here) | post-1.3.0 review of the maintainer's commit history and recorded corrections | single maintainer; not behaviourally A/B tested; structural validation only |
+| GIT-*, GATE-*, PR-NAME-ENTITIES, COMMIT-NO-ATTRIB: git, PR and commit gate rules | `workflow.md` | operating experience (maintainer's own repositories, not reproducible here) | post-1.3.0 review of the maintainer's commit history and recorded corrections | single maintainer; not behaviourally A/B tested; structural validation only |
+| DELIVERY-CROSS-REPO: cross-repository dependency order and verification | `delivery.md` | operating experience (maintainer's own repositories, not reproducible here) | post-1.3.0 review of the maintainer's commit history and recorded corrections | single maintainer; not behaviourally A/B tested; structural validation only |
+| TEST-REBASE-LOSS, ENV-*, PICK-DUPLICATE, LLM-INVARIANT-CODE, CONTRACT-LIVE, CLAIM-REPRO, LIB-NATIVE-FIRST | `verification.md`, `defect-classes.md`, `testing.md` | operating experience (maintainer's own repositories, not reproducible here) | post-1.3.0 review of the maintainer's commit history and recorded corrections | single maintainer; not behaviourally A/B tested; structural validation only |
+| BIND-*, BIND-RUNS-TESTS: project binding rules | `project-binding.md`, `testing.md` | operating experience (maintainer's own repositories, not reproducible here) | post-1.3.0 review of the maintainer's commit history and recorded corrections | single maintainer; not behaviourally A/B tested; structural validation only |
+| DOC-*: documentation rules and the documentation reference | `references/documentation.md` (DOC-TICKET, DOC-WRITE, DOC-DELEGATE), `defect-classes.md` (DOC-CHECK), and its trigger row in `SKILL.md` | operating experience (maintainer's own repositories, not reproducible here) | post-1.3.0 review of the maintainer's commit history and recorded corrections | single maintainer; not behaviourally A/B tested; structural validation only |
+| Stack profiles | `references/stacks/` | engineering judgment | 1.4.0 change list | matched by file and directory markers, a heuristic; profiles not behaviourally tested |
+| Experimental adapters | `adapters/` | engineering judgment | 1.4.0 platform-support decision | EXPERIMENTAL and unverified; no recorded run on GitHub Copilot, Cursor or any AGENTS.md-style host |
+| Validator support for reference subdirectories | `scripts/validate_skill.py` | engineering judgment | 1.4.0 change list | structural validation only |
 
 ## Reproducing this
 
