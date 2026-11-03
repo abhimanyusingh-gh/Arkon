@@ -10,6 +10,9 @@ Use these in every channel.
 - **Discovery script:** "`arkon-discover` is a standalone, stdlib-only command that works with any IDE or tool." This is the only component designed and tested as tool-independent.
 - **Engineering references:** "Tool-agnostic principles, tested only in Claude Code."
 - **Evidence:** "Derived from 1,020 review comments in one codebase plus inspected history and operating experience; see docs/03-METHODOLOGY.md for the limits." Never say the skill is proven to reduce defects.
+- **Platform status:** "Tested in Claude Code only. GitHub Copilot and Cursor are not extensively tested, and no run is recorded for either. Other assistants are untested."
+- **Adapters:** "The adapters in `adapters/` are experimental, untested." Say this next to any mention of them.
+- **Moving a platform from untested to tested:** run the skill's evaluation protocol (`docs/evaluation.md`) and the checklist in `docs/publish-checklist.md` on that platform. Record the date, the skill version, the host version and the result in `docs/EVIDENCE.md`, and update the Platform coverage table there. Only after that may a post say the platform is tested.
 - **Do not claim** compatibility with GitHub Copilot, Cursor, Devin or any other assistant until it has been tested there and the test is recorded in `docs/EVIDENCE.md`.
 
 ## 1. PyPI (`arkon-discover`)

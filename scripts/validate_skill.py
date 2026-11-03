@@ -13,6 +13,9 @@ SKILL = ROOT / "skills/craft"
 REFERENCES = SKILL / "references"
 LINE_CAPS = {"verification.md": 110, "review.md": 70, "security.md": 75, "testing.md": 200}
 RULE_ID_SOURCES = ("verification.md", "review.md")
+STACKS = "stacks"
+STACK_LINE_CAP = 70
+STACK_README_LINE_CAP = 60
 
 
 def referenced_rule_ids(path):
@@ -22,7 +25,59 @@ def referenced_rule_ids(path):
 def rule_is_defined(rule_id, references=REFERENCES):
     escaped = re.escape(rule_id)
     definition = re.compile(rf"\*\*{escaped}\s+[—-]|^## {escaped}\s+[—-]|^# {escaped}\s", re.M)
-    return any(definition.search(path.read_text()) for path in references.glob("*.md"))
+    return any(definition.search(path.read_text()) for path in references.rglob("*.md"))
+
+
+def is_linked(name, text):
+    escaped = re.escape(name)
+    link = rf"\]\((?:[^)\s#]*/)?{escaped}(?:#[^)\s]*)?\)"
+    return re.search(rf"{link}|`(?:[^`\s]*/)?{escaped}`", text) is not None
+
+
+def routing_errors(entry, references=REFERENCES):
+    errors = []
+    routed = set(re.findall(r"`references/([^`]+\.md)`", entry))
+    actual = {path.relative_to(references).as_posix() for path in references.rglob("*.md")}
+    for missing in sorted(routed - actual):
+        errors.append(f"SKILL.md: missing reference {missing}")
+    for orphan in sorted({path.name for path in references.glob("*.md")} - routed):
+        errors.append(f"SKILL.md: reference has no trigger: {orphan}")
+    for directory in sorted(path for path in references.iterdir() if path.is_dir()):
+        readme = directory / "README.md"
+        if not readme.is_file():
+            errors.append(f"references/{directory.name}: missing README.md")
+            continue
+        if f"{directory.name}/README.md" not in routed:
+            errors.append(f"SKILL.md: reference has no trigger: {directory.name}/README.md")
+        index = readme.read_text()
+        for path in sorted(directory.glob("*.md")):
+            if path.name != "README.md" and not is_linked(path.name, index):
+                errors.append(f"references/{directory.name}/README.md: unlinked reference {path.name}")
+    return errors
+
+
+def stack_profile_errors(references=REFERENCES):
+    errors = []
+    stacks = references / STACKS
+    if not stacks.is_dir():
+        return errors
+    for path in sorted(stacks.glob("*.md")):
+        text = path.read_text()
+        label = f"references/{path.relative_to(references).as_posix()}"
+        lines = len(text.splitlines())
+        cap = STACK_README_LINE_CAP if path.name == "README.md" else STACK_LINE_CAP
+        if lines > cap:
+            errors.append(f"{label}: {lines} lines exceeds the {cap}-line cap")
+        if path.name == "README.md":
+            continue
+        signals = re.search(r"^## Match signals[ \t]*$\n?(.*?)(?=^#{1,6} |\Z)", text, re.M | re.S)
+        if signals is None:
+            errors.append(f"{label}: missing ## Match signals section")
+        elif not signals.group(1).strip():
+            errors.append(f"{label}: empty ## Match signals section")
+        if not re.search(r"^# \S", text, re.M):
+            errors.append(f"{label}: missing # title")
+    return errors
 
 
 def validate():
@@ -41,12 +96,8 @@ def validate():
         if ": " in description or description.startswith(("[", "{", "*", "&", "!")):
             errors.append("SKILL.md: quote complex YAML description syntax")
 
-    routed = set(re.findall(r"`references/([^`]+\.md)`", entry))
-    actual = {path.name for path in (SKILL / "references").glob("*.md")}
-    for missing in sorted(routed - actual):
-        errors.append(f"SKILL.md: missing reference {missing}")
-    for orphan in sorted(actual - routed):
-        errors.append(f"SKILL.md: reference has no trigger: {orphan}")
+    errors.extend(routing_errors(entry))
+    errors.extend(stack_profile_errors())
     if len(entry.splitlines()) > 110:
         errors.append("SKILL.md: exceeds the repository's 110-line entrypoint budget")
     for name, cap in LINE_CAPS.items():
@@ -87,8 +138,8 @@ def validate():
                 json.loads(block)
             except json.JSONDecodeError as error:
                 errors.append(f"{relative}: invalid JSON example: {error}")
-        if path.parent == SKILL / "references":
-            for target in re.findall(r"`([a-z][a-z-]+\.md)`", content):
+        if path.parent == REFERENCES or path.parent.parent == REFERENCES:
+            for target in re.findall(r"`((?:\.\./)?[a-z][a-z-]+\.md)`", content):
                 if not (path.parent / target).is_file():
                     errors.append(f"{relative}: missing sibling reference {target}")
 
@@ -104,7 +155,7 @@ def validate():
         errors.append("Plugin and marketplace must name craft")
     if not re.fullmatch(r"\d+\.\d+\.\d+", plugin.get("version", "")):
         errors.append("Plugin version must be semantic major.minor.patch")
-    return errors, len(actual), len(documents)
+    return errors, len(list(REFERENCES.rglob("*.md"))), len(documents)
 
 
 if __name__ == "__main__":

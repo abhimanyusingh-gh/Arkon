@@ -11,6 +11,15 @@ Arkon publishes `craft`, a skill for [Claude Code](https://claude.com/claude-cod
 
 Then ask Claude to "use craft" on a task, or type `/craft`. Other install options are in [Getting started](docs/01-GETTING_STARTED.md#install).
 
+## Platform support
+
+- **Claude Code:** the only tested platform.
+- **GitHub Copilot and Cursor:** not extensively tested. No recorded run exists for either.
+- **Other assistants:** untested.
+- The engineering principles do not depend on Claude Code, but that has not been tested.
+- Draft adapters for AGENTS.md-style hosts, Cursor and GitHub Copilot are in [`adapters/`](adapters/README.md). They are EXPERIMENTAL and unverified. A Claude Code adapter snippet is also provided there.
+- Compatibility is claimed only after a test is recorded in [Evidence](docs/EVIDENCE.md#platform-coverage).
+
 ## Documentation
 
 - [Getting started](docs/01-GETTING_STARTED.md): install, use, adapt to a project, and what's new in 1.3.0
@@ -25,7 +34,7 @@ Then ask Claude to "use craft" on a task, or type `/craft`. Other install option
 
 ## Key features
 
-- **Progressive references.** 22 boundary guides load only when a task reaches that boundary. They cover security, tenancy, async jobs, LLM calls, performance, testing, verification and review.
+- **Progressive references.** 23 boundary guides load only when a task reaches that boundary, and 6 stack profiles load when the repository's signals match. They cover security, tenancy, async jobs, LLM calls, performance, testing, verification and review.
 - **An evidence card.** Substantial work reports acceptance, scope, safety, gates and anything not run. "All tests pass" is not evidence.
 - **Security for AI-assisted work.** The guides cover the private-data, untrusted-content and outbound-effect trifecta, prompt injection, and an OWASP coverage map.
 - **Mechanical checks.** Bundled scripts flag deleted tests, added skips and empty catch blocks, and discover a project's bindings with a confidence level per field.

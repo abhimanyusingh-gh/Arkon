@@ -14,6 +14,8 @@ Record the command, tested revision/artifact and relevant working-tree changes, 
 - Verify load-bearing claims against the right source: diff/callers for code structure, actual logs and test output for execution, plans/measurements for performance, deployed contracts for availability. A claim need not be visible in the diff, but it needs accessible evidence or an explicit uncertainty.
 - Use the evidence card for substantial handoffs and concise prose for a small change. Missing tools/credentials are limitations to report, not permission to fabricate a result or mutate an external environment.
 
+**CLAIM-REPRO — reproduce an agent's "cannot run" claim once.** When an agent reports that a check cannot run ("needs a display", "port unavailable"), reproduce the claim yourself before accepting it. A confirmed sandbox limit is reported as `NOT RUN: <reason>`; an unconfirmed claim is a finding to resolve, not a gate to skip.
+
 ## REGRESS-DIFF — diff against the base for what was *lost*
 
 A green suite is not evidence that nothing regressed. On a behavior-preserving refactor or capability-removing change, compare with an identified base revision for **absent** behavior as well as additions. Use these signals to investigate, not as automatic findings:
@@ -91,3 +93,6 @@ When verifying completion, distinguish evidence from explanation. Rationalizatio
 | The adapter is mocked, so integration works | A mocked dependency cannot prove production integration; verify with the real service | `CLAIM-EVIDENCE` |
 | The agent said it verified this | Automated reports are evidence of what the agent tried, not human verification or regression coverage | `CLAIM-EVIDENCE`, `REGRESS-DIFF` |
 | Too small for evidence | When a change is too narrow for unit/integration tests, record it in review prose or link the Evidence card from the delivery request | |
+| The agent says the port or display is unavailable | Reproduce the claim once; a confirmed sandbox limit is NOT RUN with its reason | `CLAIM-REPRO` |
+| Rebase or conflict resolution came through clean | Compare test count and test-file lines against base before and after | `TEST-REBASE-LOSS` |
+| The verify binding is green | A zero-test or filtered run is a failure | `BIND-RUNS-TESTS` |

@@ -11,6 +11,10 @@ Use for deployment-sensitive changes, new applications, and completion claims th
 - For feature flags, exercise on, off, and lookup failure at the backend effect and UI state boundaries. Disablement must stop new dangerous work while defining what happens to in-flight work.
 - Check graceful shutdown: stop accepting work, drain or cancel within a bound, and leave leases/claims/messages recoverable. Test restart behavior for durable work.
 
+## DELIVERY-CROSS-REPO — order and verify cross-repository dependencies
+
+When a change depends on another repository's deploy or config, such as config that must exist before code reads it, or an endpoint another repository must expose, the PR body states the order and the dependency. Before merge, verify on that repository's main branch that the dependency still exists. A merged dependency is not yet deployed; the prerequisite check under DELIVERY-READY applies.
+
 ## Operational signals
 
 - Expose health and operation outcomes sufficient to detect a stuck queue, failed write, elevated latency, and unexpected spend. Use low-cardinality, privacy-reviewed dimensions (`observability.md`).

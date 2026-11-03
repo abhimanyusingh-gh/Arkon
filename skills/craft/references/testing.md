@@ -160,3 +160,7 @@ Changing an assertion is legitimate for an intentional requirement/API/design ch
 If a still-required fixture is missing, add it; if a required nonempty result becomes empty, diagnose it. Weakening `>= 1` to `>= 0`, deleting an assertion, or skipping a case without a contract reason is green-by-weakening (`TEST-NODELETE`).
 
 Review the requirement and evidence behind an expectation change, rather than treating either every assertion edit or every green suite as trustworthy by default.
+
+**TEST-REBASE-LOSS — a rebase or conflict resolution must not lose tests.** After any rebase, conflict resolution or cherry-pick, compare the test count and test-file line counts against the base before and after. Count the framework's test declarations and `wc -l` the test files. A drop must be explained by a named deletion under `TEST-NODELETE` or restored before the push, and the gate line records both counts.
+
+**BIND-RUNS-TESTS — a recorded verify or unit binding must run the tests it claims.** A zero-test or filtered-out run is a failure, not a green result. Confirm the reported count is nonzero and matches the expected suite. Integration tests often need their own phase or task, separate from unit tests; check that the recorded command reaches them.
