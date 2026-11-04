@@ -16,6 +16,16 @@ PR titles and descriptions follow repository conventions. Lead with the concrete
 
 **PR-NAME-ENTITIES — name the entities and where they map.** Keep a PR body short, but name each concrete entity the change touches (tenant, route, service, repository, environment) and where it points, as a few lines or a small table. No narrative, no method-name lists, no file counts. Check every service or repository name against the source, not memory.
 
+**PR-FLOW-DIAGRAM — open the PR body with a small diagram of what happens.** A PR that changes runtime behaviour, routing, data flow or a rollout order starts its body with one simple Mermaid flowchart (fenced `mermaid`) that a non-author reads in seconds: input on the left, one decision per branch, destinations or outcomes on the right, at most 6 nodes, plain-language labels, and no class or method names unless they are the only way to identify a component. Show the new behaviour; when the change replaces existing behaviour, add a one-line before/after sentence above it. Put the diagram first, above Why, with a one-sentence plain description, and keep the written explanation. Skip pure refactors, dependency bumps, docs and test-only PRs. Show the drafted body, including the diagram, to the user before opening the PR (SKILL.md invariant 9).
+
+```mermaid
+flowchart LR
+    M["Patient notification"] --> Q{"Does the patient's study have a chat?"}
+    Q -- yes --> T["Study chat"]
+    Q -- no --> S["Shared chat"]
+    T -. "if posting fails" .-> S
+```
+
 ## Migrations
 
 **MIGRATE-ADDITIVE — expand, migrate consumers, then contract.** For independently deployed consumers, add a compatible shape, move readers/writers, verify all relevant deployed consumers have moved, then remove the old shape. Repo-wide search covers local callers, tests, seeds, and config; external consumers require a contract/deployment inventory too.
