@@ -7,7 +7,7 @@ name = "arkon-discover"
 version = "1.4.0"
 description = "Detect a repository's build system, framework, data stack and conventions, and write them as JSON with a confidence level per field."
 readme = "packaging/README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 license = {text = "MIT"}
 authors = [{name = "abhimanyusingh-gh"}]
 keywords = ["project-context", "conventions", "code-assistant", "static-analysis"]
