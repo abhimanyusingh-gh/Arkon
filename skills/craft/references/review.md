@@ -8,6 +8,8 @@ Start with the behaviors that can fail: authorization/scope, state transitions, 
 
 On a refactor, read `verification.md` and compare the base implementation. A removed capability together with its test can leave the suite green. Trace one real producer and consumer through changed seams; do not infer reachability from a mocked method call.
 
+For any diff that widens a guard, ask which newly reachable state has a test, and break the line to see it fail (`TEST-NEWLY-REACHABLE` in `testing.md`).
+
 **REPRO-FIRST — establish the failing path before changing error behavior.** Reproduce with the actual input/stack when feasible, or provide a minimal failing test or concrete control-flow evidence. Distinguish root cause from symptom and state what remains unproven. Do not add catches, defaults, retries, or dependency changes merely to silence an unexplained failure.
 
 Verify load-bearing claims against the right source: behavior against code/tests, gate results against actual output and revision, compatibility against deployed versions, external assumptions against the contract. If evidence is unavailable, report the limit; unavailable evidence alone does not establish a product defect.

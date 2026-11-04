@@ -151,6 +151,13 @@ For a meaningful behavior, safety or recurring defect, add a regression that rep
 
 Manual smoke and automated regression answer different questions. Preserve useful automated protection for repeatable failures; continue visual, composition and exploratory checks where automation does not establish the product behavior.
 
+## TEST-NEWLY-REACHABLE — test the state a relaxed guard now allows
+
+When a change relaxes a guard (an early return, a presence/null/empty check, a feature gate, a config or auth precondition) so code runs in a state it could not reach before, add a test in exactly that state. A test that stops at the old guard does not exercise the new path.
+
+- **Break the line to see it bite.** Temporarily break the production line the test protects (for example, replace a null-safe call with an unchecked one), run only that test, and confirm it fails. Report the failing output, then restore the line exactly and rerun.
+- A suite that stays green after that break has a coverage gap. Treat it as a should-fix, not a nit.
+
 ## TEST-PIN — preserve intent when assertions change
 
 Tests are evidence of the product contract, not an immutable product specification. When behavior is unchanged, fix a regression in the product, fixture or configuration; never replace an expected value with the observed broken value just to pass.
