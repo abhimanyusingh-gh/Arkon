@@ -43,7 +43,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    PR["Pull request"] --> Validate["validate.yml: validate_skill.py, unittest, git diff --check (Python 3.9 and 3.12)"]
+    PR["Pull request"] --> Validate["validate.yml: validate_skill.py, unittest, git diff --check (Python 3.11 and 3.14)"]
     Validate --> Merge["Squash merge to main (branch protection)"]
     Merge --> Release["release.yml: tag and GitHub release when plugin.json has a new version"]
 ```

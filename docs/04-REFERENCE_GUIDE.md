@@ -78,7 +78,7 @@ flowchart LR
 
 ## Helper scripts
 
-All are Python 3.9+, standard library only, and read-only unless noted.
+All are Python 3.11+, standard library only, and read-only unless noted.
 
 | Script | Purpose |
 |---|---|

@@ -12,7 +12,7 @@ python3 -B -m unittest discover -s tests -v
 git diff --check origin/main HEAD
 ```
 
-CI runs them on Python 3.9 and 3.12. Report the actual output in the pull request, including skips. The pre-release checks in [`docs/publish-checklist.md`](docs/publish-checklist.md) apply to any change that alters guidance.
+CI runs them on Python 3.11 and 3.14. Report the actual output in the pull request, including skips. The pre-release checks in [`docs/publish-checklist.md`](docs/publish-checklist.md) apply to any change that alters guidance.
 
 ## Changing guidance
 
@@ -25,7 +25,7 @@ CI runs them on Python 3.9 and 3.12. Report the actual output in the pull reques
 
 ## Changing scripts
 
-Helpers are Python 3.9+, standard library only, with tests in `tests/` that use temporary directories or repositories. Scripts must not make network calls unless that is their purpose (the update reminder) and must never block a session.
+Helpers are Python 3.11+, standard library only, with tests in `tests/` that use temporary directories or repositories. Scripts must not make network calls unless that is their purpose (the update reminder) and must never block a session.
 
 ## Commits and versions
 
