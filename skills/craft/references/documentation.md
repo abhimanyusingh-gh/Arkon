@@ -18,9 +18,17 @@ Use for work items, stories, wiki pages, and design or decision docs. Docs that 
 - Before publishing, run an edit pass for AI-sounding phrasing: generic openers, stacked adjectives, "robust", "seamless", reflexive triads, and sentences that restate the one before. Rewrite them plainly.
 - Remove placeholder text and unticked template boxes. A section that does not apply says so in one line.
 - For a long doc, agree the idea and scope with the user first. Diagrams are welcome where they show a flow or a boundary; a diagram that repeats the text adds noise.
-- Link tickets and PRs by key or title. Do not print raw commit SHAs in prose.
+- Link tickets and PRs through the tracker's link fields, and in prose name them by what they are. Do not print raw commit SHAs in prose.
 - Re-check the doc against the code it describes with the documentation check in [defect-classes.md](defect-classes.md).
 - End with an explicit invitation to comment on the open decisions.
+
+## DOC-HUMAN-MEMORY — write for the reader's memory, not for search
+
+- Readers remember concepts and patterns. They do not recall everything they have read, and they cannot search it.
+- References belong in configuration: tracker link fields, parent and epic links, labels, and keys that machines read.
+- In prose written for people, use no references. Prose means descriptions, explanations, and above all a request for a decision. Never use an internal id, a story or epic number, or a bare section number such as "§14 #10". Name the thing by its natural concept, pattern or framework, or by the action that needs doing, in a few words. The reader can then remember it and make the right call.
+- Each item reads on its own. Use one stable name per concept across a set of documents. Repeat the same shape across sibling items, so the pattern is learned once.
+- Bad: "blocks S2, needs G1.7". Good: "blocks mapping tasks to the target task types; needs the shadow-run gate passed".
 
 ## DOC-DELEGATE — the orchestrator plans, the cheap tier moves the records
 
