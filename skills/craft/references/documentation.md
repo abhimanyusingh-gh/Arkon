@@ -37,3 +37,5 @@ Use for work items, stories, wiki pages, and design or decision docs. Docs that 
 - Re-read the object after writing and compare it with the draft. The write counts as done only when the re-read matches.
 - Set a version message on each wiki edit that says what changed and why.
 - Refer to other tickets and pages by stable link, not by a pasted copy that will drift.
+
+For recurring status reports presented to leadership, read [status-reports.md](status-reports.md).
