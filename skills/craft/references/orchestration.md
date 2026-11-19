@@ -49,6 +49,8 @@ Delegation:   "Do the work yourself. Do not spawn or message other agents." (ORC
 Out of scope: what the worker must not touch, and what to report instead of doing
 ```
 
+Every research, review or coding brief tells the agent to fetch and read `origin/<default>` and to report the sha and date it read (GIT-FRESH).
+
 Workers return the contract card from the craft skill, filled in with real command output, plus changed paths and integration needs. A confident adjective is not a result; a blocked command is reported by name.
 
 **ORCH-BLOCKERS — every "not done" row is a blocking dependency.** A "not done" or "outside my cap" row needs a disposition before push: fixed in this PR, assigned to a later wave, or deferred with the user's approval. It is never an FYI.

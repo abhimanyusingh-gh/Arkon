@@ -11,7 +11,7 @@ Use this skill to turn a product request into working, verifiable software. Scal
 
 1. **Preserve intent.** Name the requested outcome and existing behavior that must survive. Trace requirements to running code and meaningful checks. Never delete a capability or weaken its test just to obtain green gates.
 2. **Protect boundaries.** Derive identity and customer scope from trusted authentication. Enforce authorization at the data/action boundary, including jobs, exports, caches, and storage. A cross-customer leak is a blocker.
-3. **Ground decisions.** Read the repository's instructions, callers, tests, schema, and CI before choosing patterns. Search for reuse; prefer the existing coherent design over a new parallel framework.
+3. **Ground decisions.** Read the repository's instructions, callers, tests, schema, and CI before choosing patterns. Search for reuse; prefer the existing coherent design over a new parallel framework. Read the latest default branch (`git fetch`, then `origin/<default>`), never a possibly stale local checkout; see GIT-FRESH.
 4. **Keep changes coherent.** Implement one useful slice at a time. Preserve unrelated behavior; flag adjacent cleanup rather than expanding scope. Choose the simplest design that satisfies the actual constraints.
 5. **Make invariants explicit.** Use the language's native types, schemas, and database constraints. Brand or wrap values where a real mix-up is possible; reuse existing finite-value types. Type assertions do not validate external input.
 6. **Design failure paths.** Bound external work and retries; specify partial failure, concurrency, duplicate delivery, and recovery before adding side effects. Do not claim exactly-once behavior from a lease alone.
@@ -40,7 +40,7 @@ CRAFT CONTRACT
   Acceptance          criterion -> implemented path -> test or observed result
   Scope / reuse       changed boundaries; reused symbols or reason for new code
   Safety              scope/auth invariant; failure/recovery behavior | N/A: reason
-  Capability check    base revision; preserved/changed/removed behavior + evidence
+  Capability check    base revision (fetched origin sha + date); preserved/changed/removed behavior + evidence
   Tests changed       named contract change or replacement coverage | none
   Gates               command -> result/counts/skips; revision tested
   Not run             check -> reason and remaining uncertainty | none
