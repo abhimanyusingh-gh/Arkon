@@ -27,7 +27,7 @@ The skill, its scripts and the hooks stay where Claude Code discovers them: skil
 
 ```mermaid
 flowchart LR
-    Session["Claude Code session"] -->|startup| Hook["hooks/hooks.json"]
+    Session["Claude Code session"] -->|"startup|resume|clear|compact"| Hook["hooks/hooks.json"]
     Hook --> Version["check_skill_version.py"]
     Version -.->|newer release| Reminder["Update reminder to the user"]
     Session -->|task matches description or /craft| Skill["skills/craft/SKILL.md"]
