@@ -1,9 +1,9 @@
 {
-  "description": "Remind the user when a newer craft release exists; never blocks the session.",
+  "description": "Load craft at session start and remind the user when a newer release exists; never blocks the session.",
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "startup",
+        "matcher": "startup|resume|clear|compact",
         "hooks": [
           {
             "type": "command",

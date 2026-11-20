@@ -81,7 +81,7 @@ Investigate stalls from available process/tool evidence. Simultaneous stalls may
 - The middle tier takes planning and design: plans, designs, analysis, review, and risky changes.
 - The orchestrator keeps the session model. It plans, delegates, and verifies each agent's result against its source before acting on it or reporting it; it does not redo the delegated work.
 - A user's model override for one agent applies to that agent only. Later agents go back to these tiers.
-- Omitting the tier can silently inherit the stronger tier across the fleet on hosts that allow selection, so set it on every agent.
+- Omitting the tier can silently inherit the session model across the fleet on hosts that allow selection, so set it on every agent.
 - On a host without model selection, note the intended tier in the brief.
 
 ```text
