@@ -23,6 +23,23 @@ For a single project, copy `skills/craft/` into `<project>/.claude/skills/craft/
 
 If you added the marketplace under its earlier name, `software-craftsmanship`, add it again as `abhimanyusingh-gh/Arkon`.
 
+### Updates
+
+Auto-update is off by default for third-party marketplaces. To turn it on, run `/plugin`, open Marketplaces, choose Arkon and enable auto-update. To update now, run `claude plugin update craft@Arkon`, then `/reload-plugins`.
+
+craft also loads itself at the start of each session. Set `CRAFT_AUTOLOAD=0` to turn that off.
+
+For teams, this managed settings snippet installs craft and keeps it updated on every machine:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "Arkon": { "source": { "source": "github", "repo": "abhimanyusingh-gh/Arkon" }, "autoUpdate": true }
+  },
+  "enabledPlugins": { "craft@Arkon": true }
+}
+```
+
 ## Use it
 
 Claude invokes the skill on its own when a task matches its description; `/craft` invokes it explicitly. You can also ask directly, for example "Use craft to review this diff against its acceptance criteria". The skill loads its core rules and an evidence card, then reads each reference when the work reaches that boundary. See the [reference guide](04-REFERENCE_GUIDE.md) for the routing.

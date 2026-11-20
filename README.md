@@ -11,6 +11,23 @@ Arkon publishes `craft`, a skill for [Claude Code](https://claude.com/claude-cod
 
 Then ask Claude to "use craft" on a task, or type `/craft`. Other install options are in [Getting started](docs/01-GETTING_STARTED.md#install).
 
+### Updates
+
+Auto-update is off by default for third-party marketplaces. To turn it on, run `/plugin`, open Marketplaces, choose Arkon and enable auto-update. To update now, run `claude plugin update craft@Arkon`, then `/reload-plugins`.
+
+craft also loads itself at the start of each session. Set `CRAFT_AUTOLOAD=0` to turn that off.
+
+For teams, this managed settings snippet installs craft and keeps it updated on every machine:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "Arkon": { "source": { "source": "github", "repo": "abhimanyusingh-gh/Arkon" }, "autoUpdate": true }
+  },
+  "enabledPlugins": { "craft@Arkon": true }
+}
+```
+
 ## Platform support
 
 - **Claude Code:** the only tested platform.

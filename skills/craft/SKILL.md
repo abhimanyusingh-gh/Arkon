@@ -94,4 +94,4 @@ Read relevant references before designing or changing that boundary. A task may 
 | Delegating independent work or coordinating agents | `references/orchestration.md` |
 | Working with agents: asking vs proceeding, reviewing agent diffs, instruction files | `references/agent-collaboration.md` |
 
-The plugin checks GitHub for a newer release at session start and suggests `/plugin install craft@Arkon` when one exists; the check never blocks. Evidence and its limits live in the repository's `docs/EVIDENCE.md`; do not load it for routine coding. This skill aims to improve decision coverage; correctness still requires execution and independent review.
+The plugin checks GitHub for a newer release at session start and, when one exists, suggests `claude plugin update craft@Arkon` and how to turn on marketplace auto-update; the check never blocks. It also loads craft at session start unless `CRAFT_AUTOLOAD=0` is set. Evidence and its limits live in the repository's `docs/EVIDENCE.md`; do not load it for routine coding. This skill aims to improve decision coverage; correctness still requires execution and independent review.
