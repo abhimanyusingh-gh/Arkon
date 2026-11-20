@@ -78,15 +78,17 @@ Investigate stalls from available process/tool evidence. Simultaneous stalls may
 **ORCH-MODEL — set the tier explicitly wherever the host allows it.**
 
 - The cheap, fast tier takes research, exploration, mechanical code, tests, and ticket or wiki operations.
-- The stronger tier takes design, analysis, review, and risky changes.
-- The orchestrator keeps the session model.
+- The middle tier takes planning and design: plans, designs, analysis, review, and risky changes.
+- The orchestrator keeps the session model. It plans, delegates, and verifies each agent's result against its source before acting on it or reporting it; it does not redo the delegated work.
+- A user's model override for one agent applies to that agent only. Later agents go back to these tiers.
 - Omitting the tier can silently inherit the stronger tier across the fleet on hosts that allow selection, so set it on every agent.
 - On a host without model selection, note the intended tier in the brief.
 
 ```text
-Claude Code example: cheap tier = haiku, stronger tier = sonnet
-  research, mechanical code, tests, ticket ops  -> model: haiku
-  design, analysis, review, risky changes       -> model: sonnet
+Claude Code example: cheap tier = haiku, middle tier = sonnet, orchestrator = session model
+  research, mechanical code, tests, ticket/wiki ops  -> model: haiku
+  planning, design, analysis, review, risky changes  -> model: sonnet
+  orchestrate, verify agent results                  -> session model (no agent)
   A forked agent inherits the parent model and ignores a model override.
   Use a fresh agent when a different tier is wanted.
 ```
