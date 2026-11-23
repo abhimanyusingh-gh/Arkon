@@ -19,7 +19,7 @@ When a change depends on another repository's deploy or config, such as config t
 
 - Expose health and operation outcomes sufficient to detect a stuck queue, failed write, elevated latency, and unexpected spend. Use low-cardinality, privacy-reviewed dimensions (`observability.md`).
 - Define an actionable alert and response owner for a new critical asynchronous failure mode. An error log without a recovery path is incomplete operation.
-- For latency, query and capacity work, see `performance.md`.
+- For latency, query and capacity work, see `performance.md`. For baseline metrics and dashboards before a behaviour change, see `OBS-MEASURE-FIRST` in `observability.md`.
 
 ## DELIVERY-RECOVER — a release has an exit path
 

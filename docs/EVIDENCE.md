@@ -292,6 +292,12 @@ Rule rows are operating experience from the maintainer's own repositories, ident
 | Experimental adapters | `adapters/` | engineering judgment | 1.4.0 platform-support decision | EXPERIMENTAL and unverified; no recorded run on GitHub Copilot, Cursor or any AGENTS.md-style host |
 | Validator support for reference subdirectories | `scripts/validate_skill.py` | engineering judgment | 1.4.0 change list | structural validation only |
 
+## Version 1.4.8 additions
+
+| Item | Added | Evidence label | Source | Limitation |
+|---|---|---|---|---|
+| OBS-MEASURE-FIRST, OBS-ONE-COMPONENT, OBS-LATENCY, OBS-OUTCOME, OBS-TAGS, OBS-DASHBOARD, OBS-README, OBS-DASHBOARD-AFTER-DEPLOY: metrics and dashboard rules | `observability.md`, cross-references in `delivery.md` and `documentation.md` | engineering judgment | 1.4.8 change list | maintainer direction, not a measured finding; no behavioural A/B; structural validation only |
+
 ## Reproducing this
 
 For the original PR corpora, these read-only API calls acquire source records. They do not reproduce the historical snapshot, the regex classification, session reports, or commit-history aggregates by themselves:
