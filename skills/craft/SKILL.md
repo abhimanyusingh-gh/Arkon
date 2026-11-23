@@ -80,7 +80,7 @@ Read relevant references before designing or changing that boundary. A task may 
 | UI state, visual design or client data flow | `references/frontend.md` |
 | Interactive components, forms, dialogs or announcements | `references/accessibility.md` |
 | Scheduled job, poller, queue, claim, lease or manual trigger | `references/async-jobs.md` |
-| Logs, exception handling, metrics, traces or error bodies | `references/observability.md` |
+| Logs, exception handling, metrics, dashboards, traces or error bodies | `references/observability.md` |
 | External model call, prompt, output validation or AI-assisted action | `references/llm-calls.md` |
 | Dependencies, platform upgrades, advisories or suppressions | `references/dependencies.md` |
 | Writing or changing tests | `references/testing.md` |

@@ -49,6 +49,19 @@ safeFailure(e) = { errorCode, exceptionClass, rootCauseClass, safeCodeLocation, 
 - The capture helper attaches and detaches cleanly and records field values, so a leak through a field fails the test.
 - Assert the safe code, operation and correlation remain available. Privacy tests must also preserve enough evidence to diagnose the failure. Add a case when a catch site has a different serializer or sink; do not repeat identical helper tests at every wrapper.
 
+## Metrics: measure first
+
+Metrics leave the service through the same kind of sink as logs, so the identifier and content rules above apply to every tag.
+
+- **OBS-MEASURE-FIRST — baseline before a behaviour change.** The first change to a feature or epic ships the metrics that show the current problem, plus a dashboard, so the later change can be compared with a baseline. Each story names the metric or panel it should move.
+- **OBS-ONE-COMPONENT — one metrics component per feature, on every path.** Early returns, validation failures and timeouts record an outcome too. A counter that sees only the happy path cannot show the problem.
+- **OBS-LATENCY — latency is a histogram, never only a mean.** Chart percentiles, tagged by caller role, endpoint or mode, and outcome (`success`, `error`, `timeout`).
+- **OBS-OUTCOME — outcomes are a counter with a bounded reason list.** Reasons such as "empty" or "upstream failed" come from a fixed set, so "why" can be charted without free text.
+- **OBS-TAGS — tag values are bounded and privacy-reviewed.** No free text, query text, record ids or personal data. Apply `LOG-LENGTH` and the identifier table above; a new tag gets the same review as a new log field.
+- **OBS-DASHBOARD — one dashboard for all environments.** Put it in the central monitoring scope that already sees every environment, with an environment filter that defaults to production. Group series by environment, so a cleared filter shows environments separately instead of silently summing them.
+- **OBS-README — document meters and tag values in the service README,** next to a link to the dashboard.
+- **OBS-DASHBOARD-AFTER-DEPLOY — build the dashboard once the metrics are deployed.** Validate each query against real series, and publish only after the owner approves it.
+
 ## Reviewer checklist
 
 1. Search the diff for message accessors (`getMessage`, `getLocalizedMessage`), `printStackTrace`, and throwable log arguments. On sensitive paths, verify the sink receives sanitized fields rather than raw content; a matched accessor alone is not proof of a leak.

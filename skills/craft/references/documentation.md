@@ -6,7 +6,7 @@ Use for work items, stories, wiki pages, and design or decision docs. Docs that 
 
 - A story states the outcome and the observable behavior it needs. Leave out implementation detail such as file names, classes, schemas and libraries; those belong in the design or the PR.
 - Give at most three acceptance criteria, each objective: a command result, a response, a visible state. Replace a vague criterion with a measurable one or drop it.
-- Prefer a few small stories that each yield a demonstrable slice over many tiny stories that each pass one layer.
+- Prefer a few small stories that each yield a demonstrable slice over many tiny stories that each pass one layer. A story that changes behaviour names the metric or panel it should move; the first story of an epic ships the baseline ([OBS-MEASURE-FIRST](observability.md)).
 - An initiative names one data-backed, non-code metric with its source, baseline and re-read cadence. Key results build on that metric; they do not sit beside it. A delivery count or build status is not an outcome metric.
 
 ## DOC-WRITE — docs are short, verified and easy to act on
